@@ -1,6 +1,6 @@
 -- I am so pretty!
--- module (Pretty(..)) where
-
+module Pretty (Pretty(..)) where
+  
 import Term
 
 class Pretty a where
@@ -14,4 +14,5 @@ instance Pretty Term where
     helper oldstring term = oldstring ++ " " ++ (pretty' term)
     pretty' x@(Var a) = pretty x
     pretty' x@(Comb name []) = pretty x
+    -- Put brackets arround inner function calls
     pretty' (Comb name xs) = "(" ++ name ++ "" ++ (foldl helper "" xs) ++ ")"
