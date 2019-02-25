@@ -7,6 +7,6 @@ import Term
 pretty :: Term -> String
 pretty (Var a) = a
 pretty (Comb name []) = name
-pretty (Comb name xs) = "(" ++ name ++ " " ++e  (foldr helper "" xs) ++ ")"
+pretty (Comb name xs) = "(" ++ name ++ " " ++ (foldr helper "" xs) ++ ")"
   where
   helper term oldstring = oldstring ++ (pretty term)
