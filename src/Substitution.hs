@@ -8,7 +8,7 @@ identity :: Subst
 identity = Sub (\x -> x)
 
 single:: VarName -> Term -> Subst
-single v term = Sub (\(Var v) -> term)
+single v term = Sub (\(Var x) -> if x == v then term else (Var x))
 
 compose:: Subst -> Subst -> Subst
 compose (Sub f1) (Sub f2) = Sub (f1 . f2)
