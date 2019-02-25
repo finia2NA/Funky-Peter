@@ -1,10 +1,12 @@
 -- I am so pretty!
-module (Pretty(..)) where
+-- module (Pretty(..)) where
 
 import Term
 
-class Pretty where
-  pretty :: Term -> String
+class Pretty a where
+  pretty :: a -> String
+
+instance Pretty Term where
   pretty (Var a) = a
   pretty (Comb name []) = name
   pretty (Comb name xs) = name ++ "" ++ (foldl helper "" xs)
@@ -13,9 +15,3 @@ class Pretty where
     pretty' x@(Var a) = pretty x
     pretty' x@(Comb name []) = pretty x
     pretty' (Comb name xs) = "(" ++ name ++ "" ++ (foldl helper "" xs) ++ ")"
-  
--- -- I'm pretty too
--- pretty2 :: Term -> String
--- pretty2 (Var a) = a
--- pretty2 (Comb name []) = name
--- pretty2 (Comb name [x : []]) = 
