@@ -2,15 +2,16 @@
 
 import Term
 
-data Subst = Sub (VarName -> Term)
+data Subst = Sub (Term -> Term)
 
 identity :: Subst
-identity = Sub (\x -> Var x)
+identity = Sub (\x -> x)
 
 single:: VarName -> Term -> Subst
-single v term = Sub (\x -> term)
+single v term = Sub (\(Var v) -> term)
 
 compose:: Subst -> Subst -> Subst
-compose s1 s2 = Sub (s1 . s2)
+compose (Sub f1) (Sub f2) = Sub (f1 . f2)
 
 apply:: Subst -> Term -> Term
+apply (Sub sub) term = sub term
