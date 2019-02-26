@@ -10,7 +10,7 @@ instance Pretty Term where
   pretty (Var a) = a
   pretty (Comb name []) = name
   pretty (Comb name xs) = name ++ "" ++ (foldl helper "" xs)
-    where
+   where
     helper oldstring term = oldstring ++ " " ++ (pretty' term)
     pretty' x@(Var a) = pretty x
     pretty' x@(Comb name []) = pretty x
