@@ -17,17 +17,16 @@ instance Arbitrary Term where
           xs <- arbitrary
           return (Comb name xs)
       genN :: Int -> Gen ([Term])
-      genN 1 = do
-        theTree <- asTerm 0
-        return ([theTree])
+      genN 0 = do
+        return []
       genN n = do
-        theTree <- asTerm (n-1)
-        xs <- genN (n-1)
-        return (theTree:xs)
+        currentTerm <- asTerm (n - 1)
+        xs <- genN (n - 1)
+        return (currentTerm:xs)
 
-instance Arbitrary Subst
-  arbitrary = do
-  s_type <- choose 
+-- instance Arbitrary Subst
+--   arbitrary = do
+--   s_type <- choose 
 
 
     -- varname <- arbitrary
