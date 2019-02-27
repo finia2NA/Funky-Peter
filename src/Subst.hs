@@ -15,4 +15,5 @@ compose:: Subst -> Subst -> Subst
 compose (Sub f1) (Sub f2) = Sub (f1 . f2)
 
 apply:: Subst -> Term -> Term
-apply (Sub sub) term = sub term
+apply (Sub sub) t@(Var _) = sub t
+apply sub (Comb n xs) = Comb n (map (apply sub) xs)
