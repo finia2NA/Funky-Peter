@@ -13,3 +13,21 @@ instance Arbitrary Term where
       | otherwise = do
         listLength <- choose (0, s - 1)
         treeList
+
+prop_identity :: Term -> Bool
+prop_identity t1 = apply identity t1 == t1
+
+prop_single_easy :: String -> Term -> Bool
+prop_single_easy s t = apply (single s t) (Var s) == t
+
+prop_single_hard :: String -> String -> Term -> Propterty
+prop_single_hard o s t = o != s ==> apply (single s t) (Var o) == Var o
+
+prop_apply_args :: String -> Subst -> [Term] -> Bool
+prop_apply_args c s ts = apply s (Comb c ts) == Comb c (map (apply s) ts)
+
+prop_identity_neutral :: Subst -> Term -> Bool
+prop_identity_neutral s t = apply (compose identity s) t == apply (compose s identity) t
+
+prop_componse_apply :: Subst -> Subst -> Term
+prop_componse_apply s1 s2 t = apply (compose s2 s1) t == apply s2 (apply s1 t1)
