@@ -1,28 +1,7 @@
 import Term
-import Pretty
--- Examples:
-
--- Var "m"
--- Var "m" => (0, 0)
-
--- Comb "Succ" [Comb "Zero" []]
--- Comb "Succ" => (0, 0)
---        |
---        |
--- Comb "Zero" => (1, 0)
-
--- Comb "Succ" [Comb "Zero" []], Comb "mul" [Var "m", Var "n"]]
---               Comb "Succ" => (0, 0)
---               /         \
---              /           \
---  Comb "Zero" => (1, 0)   Comb "mul" => (1, 1)
---                          /         \
---                         /           \
---               Var "m" => (2, 0)     Var "n" => (2, 1)
-
--- =============================================================================
 
 type Pos = [Int]
+
 -- is pos1 a function that uses pos2 as an argument?
 above:: Pos -> Pos -> Bool
 above pos1 pos2 = length pos1 < length pos2 && pos1 == (take (length pos1) pos2)
@@ -48,8 +27,8 @@ replaceAt src [] rpl = rpl
 replaceAt (Comb n ss) (p:ps) rpl = let (x, (y: ys)) = splitAt p ss in
   Comb n (x ++ [(replaceAt y ps rpl)] ++ ys)
 
--- allPos :: Term -> [Pos]
+allPos :: Term -> [Pos]
 allPos (Var v) = [[]]
 allPos (Comb c xs) = let li = (length xs) - 1 in -- li = lastIndex
    [[]] -- the path that ends here
-   ++ [(a:s) | a <- [0 .. li], s <- (allPos (xs !! a))]
+   ++ [(a:s) | a <- [0 .. li], s <- (allPos (xs !! a))] -- Paths to all children
