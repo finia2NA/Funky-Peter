@@ -11,25 +11,42 @@ import Pos
 -- Returns a list of substitutions from t1 to t2 if it is possible
 match:: Term -> Term -> Maybe Subst
 match t1 t2 
-  | eap t1 t2 = Just (
-    foldr Subst.compose Subst.identity (
-      map (\(Var v) -> Subst.single v t2) (
-        map (Pos.selectAt t1) (findAllVars t1)
-      )
-    )
-  )
+  | eap t1 t2 = Just (foldr Subst.compose Subst.identity (map (\pos -> (Pos.selectAt t1 pos) . (\(Var v) -> Subst.single v (Pos.selectAt t2 pos))) (findAllVars t1)))
   | otherwise = Nothing
+
+-- helper :: Term -> Term -> Pos -> Subst
+-- helper t1 t2 pos = let newTerm = (selectAt pos t2) in
+--   Subst.single(t1 newTerm)
   
--- given two terms t1 and t2
+{-
+  given two terms t1 and t2,
+  is there a term in t2 at the same position as every var in t1?
+  
+  AKA gilt 
+  ∀var∈t1: ∃term∈t2: t1.pos=t2.pos
+  ?
+-}
 eap :: Term -> Term -> Bool
 eap t1 t2 = let baum = (Pos.allPos t2) in
   foldl (helper baum) True (findAllVars t1)
    where
     helper baum prevBool pfad  = prevBool && (elem pfad baum)
 
--- Returns the Pos of all Vars in a given Term
+-- Returns the positions of all vars in a given term
 findAllVars :: Term -> [Pos]
 findAllVars t = filter (\p -> isVar (Pos.selectAt t p)) (Pos.allPos t)
  where
   isVar (Var _) = True
   isVar _ = False
+
+--------------------- test code ---------------------
+
+unwrap :: Maybe Subst -> Subst
+unwrap (Just s) = s
+unwrap (Nothing) = identity
+
+
+
+t1 = Comb "add" [Comb "Succ" [Comb "Zero" []], Comb "mul" [Var "m", Var "n"]]
+t2 = Comb "add" [Comb "Succ" [Comb "Zero" []], Comb "mul" [Comb "Succ" [Comb "Zero" []], Comb "Succ" [Comb "Zero" []]]]
+test1 = apply (unwrap (match t1 t2)) t1
