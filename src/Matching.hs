@@ -11,8 +11,18 @@ import Pos
 -- Returns a list of substitutions from t1 to t2 if it is possible
 match:: Term -> Term -> Maybe Subst
 match t1 t2 
-  | eap t1 t2 = Just (foldr Subst.compose Subst.identity (map (\pos -> (Pos.selectAt t1 pos) . (\(Var v) -> Subst.single v (Pos.selectAt t2 pos))) (findAllVars t1)))
+  | eap t1 t2 = Just (
+      foldr Subst.compose Subst.identity (
+        map (\pos ->
+          (\(Var v) -> Subst.single v (Pos.selectAt t2 pos))
+          $ (Pos.selectAt t1 pos)
+          )
+          (findAllVars t1)
+      )
+    )
   | otherwise = Nothing
+
+
 
 -- helper :: Term -> Term -> Pos -> Subst
 -- helper t1 t2 pos = let newTerm = (selectAt pos t2) in
@@ -47,6 +57,9 @@ unwrap (Nothing) = identity
 
 
 
-t1 = Comb "add" [Comb "Succ" [Comb "Zero" []], Comb "mul" [Var "m", Var "n"]]
-t2 = Comb "add" [Comb "Succ" [Comb "Zero" []], Comb "mul" [Comb "Succ" [Comb "Zero" []], Comb "Succ" [Comb "Zero" []]]]
+-- t1 = Comb "add" [Comb "Succ" [Comb "Zero" []], Comb "mul" [Var "m", Var "n"]]
+-- t2 = Comb "add" [Comb "Succ" [Comb "Zero" []], Comb "mul" [Comb "Succ" [Comb "Zero" []], Comb "Succ" [Comb "Zero" []]]]
+
+t1 = Comb "add" [Var "2", Var "3"]
+t2 = Comb "add" [Comb "TWO" [], Comb "THREE" []]
 test1 = apply (unwrap (match t1 t2)) t1
