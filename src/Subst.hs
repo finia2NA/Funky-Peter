@@ -1,5 +1,4 @@
 module Subst where
--- ADT for subtitution from variables to terms
 
 import Term
 

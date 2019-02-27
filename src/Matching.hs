@@ -11,12 +11,14 @@ import Pos
 -- Returns a list of substitutions from t1 to t2 if it is possible
 match:: Term -> Term -> Maybe Subst
 match t1 t2 
-  | eap t1 t2 = Just (foldr Subst.compose Subst.identity (map (\pos -> (Pos.selectAt t1 pos) . (\(Var v) -> Subst.single v (Pos.selectAt t2 pos))) (findAllVars t1)))
+  | eap t1 t2 = Just (
+    foldr Subst.compose Subst.identity (map (helper t1 t2) (findAllVars t1))
+    )
   | otherwise = Nothing
 
--- helper :: Term -> Term -> Pos -> Subst
--- helper t1 t2 pos = let newTerm = (selectAt pos t2) in
---   Subst.single(t1 newTerm)
+helper :: Term -> Term -> Pos -> Subst
+helper t1@(Var v) t2 pos = let newTerm = (selectAt t2 pos) in
+  single v newTerm
   
 {-
   given two terms t1 and t2,
