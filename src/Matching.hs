@@ -16,10 +16,17 @@ match t1 t2
     )
   | otherwise = Nothing
 
+
+-- ----------------------------!!!------------------------------
+
 helper :: Term -> Term -> Pos -> Subst
-helper t1@(Var v) t2 pos = let newTerm = (selectAt t2 pos) in
-  single v newTerm
-  
+helper comb@(Comb _ _) fullterm2 matchedPosition =
+  let grabVar = (selectAt t1 matchedPosition)
+      grabTerm = (selectAt t2 matchedPosition)
+  in helper2 grabVar grabTerm
+   where helper2 (Var varname) term = single varname term
+
+-- ----------------------------!!!------------------------------
 {-
   given two terms t1 and t2,
   is there a term in t2 at the same position as every var in t1?
@@ -52,3 +59,7 @@ unwrap (Nothing) = identity
 t1 = Comb "add" [Comb "Succ" [Comb "Zero" []], Comb "mul" [Var "m", Var "n"]]
 t2 = Comb "add" [Comb "Succ" [Comb "Zero" []], Comb "mul" [Comb "Succ" [Comb "Zero" []], Comb "Succ" [Comb "Zero" []]]]
 test1 = apply (unwrap (match t1 t2)) t1
+
+t3 = Comb "add" [Var "2", Var "3"]
+t4 = Comb "add" [Comb "TWO" [], Comb "THREE" []]
+test2 = apply (unwrap (match t3 t4)) t3
