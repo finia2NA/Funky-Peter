@@ -49,18 +49,7 @@ replaceAt (Comb n ss) (p:ps) rpl = let (x, (y: ys)) = splitAt p ss in
   Comb n (x ++ [(replaceAt y ps rpl)] ++ ys)
 
 -- allPos :: Term -> [Pos]
--- allPos input = [[]] ++ (allPos' input)
---  where
---   allPos' (Var name) = []
---   allPos' (Comb Combname list) = (0 .. (length list))
-
-
--- paths :: Tree -> [[Int]]
--- paths Leaf = [[]]
--- -- paths (Node x Leaf Leaf) = [[x]]
-
-
--- -- paths (Node x left right) = map (x:) (paths left ++ paths right)
--- paths (Node x list) = map (x:) (foldl helper [[]] list)
---  where
---   helper oldinput listelement = oldinput ++ (paths listelement)
+allPos (Var v) = [[]]
+allPos (Comb c xs) = let li = (length xs) - 1 in -- li = lastIndex
+   [[]] -- the path that ends here
+   ++ [(a:s) | a <- [0 .. li], s <- (allPos (xs !! a))]
