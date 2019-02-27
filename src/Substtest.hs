@@ -42,7 +42,7 @@ prop_single_easy :: String -> Term -> Bool
 prop_single_easy s t = apply (single s t) (Var s) == t
 
 prop_single_hard :: String -> String -> Term -> Property
-prop_single_hard o s t = o != s ==> apply (single s t) (Var o) == Var o
+prop_single_hard o s t = o /= s ==> apply (single s t) (Var o) == Var o
 
 prop_apply_args :: String -> Subst -> [Term] -> Bool
 prop_apply_args c s ts = apply s (Comb c ts) == Comb c (map (apply s) ts)
