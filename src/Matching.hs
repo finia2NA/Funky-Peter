@@ -21,12 +21,6 @@ match t1 t2
       )
     )
   | otherwise = Nothing
-
-
-
--- helper :: Term -> Term -> Pos -> Subst
--- helper t1 t2 pos = let newTerm = (selectAt pos t2) in
---   Subst.single(t1 newTerm)
   
 {-
   given two terms t1 and t2,
@@ -55,11 +49,10 @@ unwrap :: Maybe Subst -> Subst
 unwrap (Just s) = s
 unwrap (Nothing) = identity
 
+t11 = Comb "add" [Var "2", Var "3"]
+t21 = Comb "add" [Comb "TWO" [], Comb "THREE" []]
+test1 = apply (unwrap (match t11 t21)) t11
 
-
--- t1 = Comb "add" [Comb "Succ" [Comb "Zero" []], Comb "mul" [Var "m", Var "n"]]
--- t2 = Comb "add" [Comb "Succ" [Comb "Zero" []], Comb "mul" [Comb "Succ" [Comb "Zero" []], Comb "Succ" [Comb "Zero" []]]]
-
-t1 = Comb "add" [Var "2", Var "3"]
-t2 = Comb "add" [Comb "TWO" [], Comb "THREE" []]
-test1 = apply (unwrap (match t1 t2)) t1
+t31 = Comb "add" [Var "2", Var "3"]
+t41 = Comb "add" [Var "4", Var "5"]
+test2 = apply (unwrap (match t31 t41)) t31
