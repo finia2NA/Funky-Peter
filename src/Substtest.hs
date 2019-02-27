@@ -25,6 +25,15 @@ instance Arbitrary Term where
         xs <- genN (n-1)
         return (theTree:xs)
 
+instance Arbitrary Subst
+  arbitrary = do
+  s_type <- choose 
+
+
+    -- varname <- arbitrary
+    -- replaceTerm <- arbitrary
+    -- return (single varname replaceTerm)
+
 
 prop_identity :: Term -> Bool
 prop_identity t1 = apply identity t1 == t1
