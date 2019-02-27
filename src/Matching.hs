@@ -12,13 +12,7 @@ import Pos
 match:: Term -> Term -> Maybe Subst
 match t1 t2 
   | eap t1 t2 = Just (
-      foldr Subst.compose Subst.identity (
-        map (\pos ->
-          (\(Var v) -> Subst.single v (Pos.selectAt t2 pos))
-          $ (Pos.selectAt t1 pos)
-          )
-          (findAllVars t1)
-      )
+    foldr Subst.compose Subst.identity (map (helper t1 t2) (findAllVars t1))
     )
   | otherwise = Nothing
   
@@ -53,6 +47,11 @@ t11 = Comb "add" [Var "2", Var "3"]
 t21 = Comb "add" [Comb "TWO" [], Comb "THREE" []]
 test1 = apply (unwrap (match t11 t21)) t11
 
-t31 = Comb "add" [Var "2", Var "3"]
-t41 = Comb "add" [Var "4", Var "5"]
-test2 = apply (unwrap (match t31 t41)) t31
+
+testvar1 = Comb "add" [Comb "Succ" [Comb "Zero" []], Comb "mul" [Var "m", Var "n"]]
+testvar2 = Comb "add" [Comb "Succ" [Comb "Zero" []], Comb "mul" [Comb "Succ" [Comb "Zero" []], Comb "Succ" [Comb "Zero" []]]]
+test1 = apply (unwrap (match testvar1 testvar2)) testvar1
+
+testvar3 = Comb "add" [Var "2", Var "3"]
+testvar4 = Comb "add" [Comb "TWO" [], Comb "THREE" []]
+test2 = apply (unwrap (match testvar3 testvar4)) testvar3
