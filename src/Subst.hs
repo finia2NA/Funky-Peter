@@ -15,3 +15,5 @@ compose (Sub f1) (Sub f2) = Sub (f1 . f2)
 
 apply:: Subst -> Term -> Term
 apply (Sub sub) term = sub term
+
+test1 = apply (single ("hi") (Var "ho")) (Var "hi")
