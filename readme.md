@@ -1,2 +1,2 @@
 # Hi
-__When you try so hard but you don't succeed__
+_I hope you have an amazing day_
