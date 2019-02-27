@@ -13,9 +13,10 @@ instance Arbitrary Term where
           return (Var name)
         | otherwise = do
           name <- arbitrary
-          listLength <- choose (0, s - 1)
-          xs <- arbitrary
+          listLength <- choose (0, (s-1))
+          xs <- genN listLength
           return (Comb name xs)
+      -- generates a list of Length n of Terms
       genN :: Int -> Gen ([Term])
       genN 0 = do
         return []
