@@ -5,8 +5,8 @@ import Term
 instance Arbitrary Term where
   arbitrary =
     -- complexity of generated terms:
-    -- numberOfArgumentsPerTerm: O(log(sized))
-    -- averageTermDepth: O(sized)
+    --  numberOfArgumentsPerTerm: O(log(sized))
+    --  averageTermDepth: O(sized)
     sized asTerm
      where
       asTerm :: Int -> Gen (Term)
@@ -20,8 +20,10 @@ instance Arbitrary Term where
           termLength <- choose (0, quot s 2)
           xs <- genN listLength termLength
           return (Comb name xs)
+
       -- generates a list of Length n of Terms of Length m.
       genN :: Int -> Int -> Gen ([Term])
+      -- TODO there probably is a better way to write this than do and immidiatly return
       genN 0 _ = do
         return []
       genN n m = do
@@ -29,15 +31,23 @@ instance Arbitrary Term where
         xs <- genN (n - 1) (quot m 2)
         return (currentTerm:xs)
 
--- instance Arbitrary Subst
---   arbitrary = do
---   s_type <- choose 
+instance Arbitrary Subst where
+  arbitrary = frequency[(1, genIdentity), (1, genSingle), (3, genCompose)]
+   where
+    genIdentity :: Gen (Subst)
+    genIdentity = do return identity
 
+    genSingle :: Gen (Subst)
+    genSingle = do
+      varname <- arbitrary
+      term <- arbitrary
+      return (single varname term)
 
-    -- varname <- arbitrary
-    -- replaceTerm <- arbitrary
-    -- return (single varname replaceTerm)
-
+    genCompose :: Gen (Subst)
+    genCompose = do
+      s1 <- arbitrary
+      s2 <- arbitrary
+      return (compose s1 s2)
 
 prop_identity :: Term -> Bool
 prop_identity t1 = apply identity t1 == t1
