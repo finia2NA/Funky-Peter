@@ -14,15 +14,16 @@ instance Arbitrary Term where
         | otherwise = do
           name <- arbitrary
           listLength <- choose (0, (s-1))
-          xs <- genN listLength
+          termLength <- choose (0, quot s 2)
+          xs <- genN listLength termLength
           return (Comb name xs)
-      -- generates a list of Length n of Terms
-      genN :: Int -> Gen ([Term])
-      genN 0 = do
+      -- generates a list of Length n of Terms of Length m.
+      genN :: Int -> Int -> Gen ([Term])
+      genN 0 _ = do
         return []
-      genN n = do
-        currentTerm <- asTerm (n - 1)
-        xs <- genN (n - 1)
+      genN n m = do
+        currentTerm <- asTerm m
+        xs <- genN (n - 1) (quot m 2)
         return (currentTerm:xs)
 
 -- instance Arbitrary Subst
