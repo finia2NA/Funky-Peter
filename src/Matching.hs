@@ -12,8 +12,13 @@ import Pos
 match:: Term -> Term -> Maybe Subst
 match t1 t2 
   | eap t1 t2 = Just (
-    foldr Subst.compose Subst.identity (map (helper t1 t2) (findAllVars t1))
-    )
+    foldr Subst.compose Subst.identity (
+        map (\pos ->
+          (\(Var v) -> Subst.single v (Pos.selectAt t2 pos))
+          $ (Pos.selectAt t1 pos)
+          )
+          (findAllVars t1)
+      )
   | otherwise = Nothing
   
 {-
