@@ -14,5 +14,13 @@ instance Arbitrary Term where
         | otherwise = do
           name <- arbitrary
           listLength <- choose (0, s - 1)
-          termList <- [term | tlength <- choose(0, s-1), term <- asTerm tlength]
-          return (Comb name termList)
+          xs <- arbitrary
+          return (Comb name xs)
+      genN :: Int -> Gen ([Term])
+      genN 1 = do
+        theTree <- asTerm 0
+        return ([theTree])
+      genN n = do
+        theTree <- asTerm (n-1)
+        xs <- genN (n-1)
+        return (theTree:xs)
