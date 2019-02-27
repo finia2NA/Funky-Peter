@@ -1,3 +1,5 @@
+module Pos where
+
 import Term
 
 type Pos = [Int]
@@ -26,7 +28,7 @@ selectAt (Comb _ xs) (p:ps) = selectAt (xs !! p) ps
 -- switches out a subterm at a given position.
 replaceAt :: Term -> Pos -> Term -> Term
 replaceAt src [] rpl = rpl
-replaceAt (Comb n ss) (p:ps) rpl = let (x, (y: ys)) = splitAt p ss in
+replaceAt (Comb n sl) (p:ps) rpl = let (x, (y: ys)) = splitAt p sl in
   Comb n (x ++ [(replaceAt y ps rpl)] ++ ys)
 
 -- returns a list of all Possible Positions within the Term.
