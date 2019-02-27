@@ -23,7 +23,7 @@ selectAt :: Term -> Pos -> Term
 selectAt term [] = term
 selectAt (Comb _ xs) (p:ps) = selectAt (xs !! p) ps
 
--- replaces switches out a subterm at a given position.
+-- switches out a subterm at a given position.
 replaceAt :: Term -> Pos -> Term -> Term
 replaceAt src [] rpl = rpl
 replaceAt (Comb n ss) (p:ps) rpl = let (x, (y: ys)) = splitAt p ss in
