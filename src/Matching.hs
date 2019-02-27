@@ -20,7 +20,7 @@ match t1 t2
 -- ----------------------------!!!------------------------------
 
 helper :: Term -> Term -> Pos -> Subst
-helper comb@(Comb _ _) fullterm2 matchedPosition =
+helper t1 t2 matchedPosition =
   let grabVar = (selectAt t1 matchedPosition)
       grabTerm = (selectAt t2 matchedPosition)
   in helper2 grabVar grabTerm
@@ -56,10 +56,10 @@ unwrap (Nothing) = identity
 
 
 
-t1 = Comb "add" [Comb "Succ" [Comb "Zero" []], Comb "mul" [Var "m", Var "n"]]
-t2 = Comb "add" [Comb "Succ" [Comb "Zero" []], Comb "mul" [Comb "Succ" [Comb "Zero" []], Comb "Succ" [Comb "Zero" []]]]
-test1 = apply (unwrap (match t1 t2)) t1
+testvar1 = Comb "add" [Comb "Succ" [Comb "Zero" []], Comb "mul" [Var "m", Var "n"]]
+testvar2 = Comb "add" [Comb "Succ" [Comb "Zero" []], Comb "mul" [Comb "Succ" [Comb "Zero" []], Comb "Succ" [Comb "Zero" []]]]
+test1 = apply (unwrap (match testvar1 testvar2)) testvar1
 
-t3 = Comb "add" [Var "2", Var "3"]
-t4 = Comb "add" [Comb "TWO" [], Comb "THREE" []]
-test2 = apply (unwrap (match t3 t4)) t3
+testvar3 = Comb "add" [Var "2", Var "3"]
+testvar4 = Comb "add" [Comb "TWO" [], Comb "THREE" []]
+test2 = apply (unwrap (match testvar3 testvar4)) testvar3
