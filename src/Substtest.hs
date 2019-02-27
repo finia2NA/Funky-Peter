@@ -4,6 +4,9 @@ import Term
 
 instance Arbitrary Term where
   arbitrary =
+    -- complexity of generated terms:
+    -- numberOfArgumentsPerTerm: O(log(sized))
+    -- averageTermDepth: O(sized)
     sized asTerm
      where
       asTerm :: Int -> Gen (Term)
