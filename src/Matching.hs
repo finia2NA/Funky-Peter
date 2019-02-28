@@ -23,7 +23,26 @@ match t1 t2
       )
     )
   | otherwise = Nothing
-  
+
+match2 :: Term -> Term -> Maybe Subst
+match2 t1 t2 
+-- wenn es für jede Var ein subst geben wird,
+-- dann return ein composed Subst von all diesen.
+  | etav t1 t2 = Just (
+    foldr Subst.compose Subst.identity (map (helper t1 t2) (findAllVars t1))
+    )
+  | otherwise = Nothing
+ where
+  helper :: Term -> Term -> Pos -> Subst
+  helper t1 t2 matchedPosition =
+    let grabVar = (selectAt t1 matchedPosition)
+        grabTerm = (selectAt t2 matchedPosition)
+    in helper2 grabVar grabTerm
+    -- construct a Subst from a Variable and a Term.
+     where
+      helper2 :: Term -> Term -> Subst
+      helper2 (Var varname) term = single varname term
+
 {-
   given two terms t1 and t2,
   is there a term in t2 at the same position as every var in t1?
