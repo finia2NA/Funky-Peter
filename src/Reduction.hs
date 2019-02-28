@@ -1,41 +1,30 @@
 import Matching
 import Prog
 import Term
-import Subst
+import Subst 
 
 -- Suche Regel in Prog (Liste von Regeln) für die gilt:
 --  - Linke Seite ist == Term
 --  - Es existiert match zwischen term und rhs
       
--- findRule1 :: Prog -> Term -> Maybe(Rhs, Subst)
--- findRule1 prog term =
---   myReturn term (myFinder prog term)
---  where 
---   myReturn _ Nothing = Nothing
---   myReturn term (Just Rhs) = Just(Rhs, Subst.single(term, Rhs))
+findRule1 :: Prog -> Term -> Maybe(Rhs, Subst)
+findRule1 (Prog prog) term =
+  myReturn term (myFinder prog term)
+   where 
 
---   myFinder [] _ = Nothing
---   myFinder ((Rule Lhs Rhs):s) term
---     | unifiable term Lhs = Just Rhs
---     | otherwise = myFinder s term
+    myReturn _ Nothing = Nothing
+    myReturn (Var v) (Just rhs) = Just(rhs, (Subst.single v rhs))
 
---   unifiable specific general
---     | Matching.match general specific == Nothing = False
---     | otherwise = True
+    myFinder [] _ = Nothing
+    myFinder ((Rule lhs rhs):s) term
+      | unifiable term lhs = Just rhs
+      | otherwise = myFinder s term
 
-      
-findRule2 :: Prog -> Term -> Maybe(Rhs, Subst)
-findRule2 prog term = unwrap find filter (map mapper prog)
- where
-  mapper (Rule lh rh ) = let susbst = maybe rh term in 
-    if match lf term != Nothing && subst != Nothing
-      then Just (rh, subst)
-      else Nothing
-  filter (Just _ _) = True
-  filter _ = False
-  unwrap :: Maybe a -> a
-  unwrap (Just x) = x
-  unwrap (Nothing) = Nothing
+    unifiable specific general = unwrapJust (Matching.match general specific)
+
+    unwrapJust Nothing = False
+    unwrapJust (Just _) = True
+
 
 
 testRules = [(Rule (Comb "add" [Comb "ZERO" [], Var "m"]) (Var "m"))]
