@@ -4,6 +4,7 @@ import Reduction
 import Pos
 import Term
 import Prog
+import Util
 import Data.List
 
 {-
@@ -97,9 +98,15 @@ riStrategy = (\prog term -> sortBy strategy (reduciblePos prog term))
 --  where
 --   strategy :: Pos -> Pos -> Ordering
 
+-- Reduces a term using a program at the first position provided by a given strategy
+reduceWith :: Strategy -> Prog -> Term -> Maybe Term
+reduceWith strat prog term
+  | length poss < 1 = Nothing 
+  | otherwise       = reduceAt prog term (poss !! 0)
+   where poss = strat prog term
 
--- reduceWith :: Strategy -> Prog -> Term -> Maybe Term
--- reduceWith str prg trm =
-
--- evaluateWith :: Strategy -> Prog -> Term -> Term
--- evaluateWith str prg trm =yya
+-- Evaluates a Term with a given Program until it is in its normal form.
+evaluateWith :: Strategy -> Prog -> Term -> Term
+evaluateWith strat prog term
+  | isNormalForm prog term = term
+  | otherwise = evaluateWith strat prog (unwrap (reduceWith strat prog term))

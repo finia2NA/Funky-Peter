@@ -5,6 +5,7 @@ import Prog
 import Term
 import Subst
 import Pos
+import Util
 
 
 -- returned die erste Regel, die man auf den Term anwenden kann,
@@ -18,9 +19,6 @@ findRule (Prog rules) term = foldr reductor Nothing rules
     if notNothing (match lh term)
       then Just (rh, (unwrap (match lh term)))
       else Nothing
-   where
-    unwrap :: Maybe a -> a
-    unwrap (Just a) = a 
 
 -- given a term a and a program p, returns a term a' which was reduced at a given pos, 
 -- or nothing if such a reduction was not possible with the given p.
@@ -42,11 +40,6 @@ reduciblePos prog term = filter isReduciblePos (allPos term)
 -- is the given term already reduced as much as possible given this program?
 isNormalForm :: Prog -> Term -> Bool
 isNormalForm prog term = length (reduciblePos prog term) == 0 
-
--- helper function for Maybe: returns wether the argument is a Just or a Nothing
-notNothing :: Maybe a -> Bool
-notNothing (Just _) = True
-notNothing _        = False
 
 -- Tests 
 testProg1 = Prog [(Rule (Comb "add" [Comb "ZERO" [], Var "m"]) (Var "m"))]
