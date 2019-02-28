@@ -2,6 +2,7 @@ import Test.QuickCheck
 import Subst
 import Term
 
+-- ============================== arbitrary Term ==============================
 instance Arbitrary Term where
   arbitrary =
     -- complexity of generated terms:
@@ -31,23 +32,34 @@ instance Arbitrary Term where
         xs <- genN (n - 1) (quot m 2)
         return (currentTerm:xs)
 
+
+-- ============================== arbitrary Subst ==============================
 instance Arbitrary Subst where
-  arbitrary = frequency[(1, genIdentity), (1, genSingle), (3, genCompose)]
+  -- arbitrary = frequency[(2, genIdentity), (2, genSingle), (1, genCompose)]
+  arbitrary = sized asSub
    where
-    genIdentity :: Gen (Subst)
+    asSub :: Int -> Gen Subst
+    asSub n = do
+      composeProb <- choose (0, n)
+      re <- frequency[(10, genIdentity), (10, genSingle), (n, genCompose n)]
+      return re
+
+    genIdentity :: Gen Subst
     genIdentity = do return identity
 
-    genSingle :: Gen (Subst)
+    genSingle :: Gen Subst
     genSingle = do
       varname <- arbitrary
       term <- arbitrary
       return (single varname term)
 
-    genCompose :: Gen (Subst)
-    genCompose = do
-      s1 <- arbitrary
-      s2 <- arbitrary
+    genCompose :: Int ->  Gen Subst
+    genCompose n = do
+      s1 <- (asSub (quot n 2))
+      s2 <- (asSub (quot n 2))
       return (compose s1 s2)
+
+-- ================================ Properties ================================
 
 prop_identity :: Term -> Bool
 prop_identity t1 = apply identity t1 == t1
@@ -62,7 +74,8 @@ prop_apply_args :: String -> Subst -> [Term] -> Bool
 prop_apply_args c s ts = apply s (Comb c ts) == Comb c (map (apply s) ts)
 
 prop_identity_neutral :: Subst -> Term -> Bool
-prop_identity_neutral s t = apply (compose identity s) t == apply (compose s identity) t
+prop_identity_neutral s t = 
+  apply (compose identity s) t == apply (compose s identity) t
 
 prop_componse_apply :: Subst -> Subst -> Term -> Bool
 prop_componse_apply s1 s2 t = apply (compose s2 s1) t == apply s2 (apply s1 t)
