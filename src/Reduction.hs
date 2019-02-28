@@ -18,37 +18,30 @@ findRule (Prog rules) term = foldr reductor Nothing rules
       then Just (rh, (unwrap (match rh term)))
       else Nothing
    where
+    notNothing :: Maybe a -> Bool
     notNothing (Just _) = True
     notNothing _        = False
+    unwrap :: Maybe a -> a
+    unwrap (Just a) = a  
 
 
-unwrap :: Maybe a -> a
-unwrap (Just a) = a
-
-
-testRules = Prog [(Rule (Comb "add" [Comb "ZERO" [], Var "m"]) (Var "m"))]
-testTerm = (Comb "add" [Comb "ZERO" [], Comb "SUCC" [Comb "SUCC" [Comb "ZERO" []]]])
-        
       
+-- findRule1 :: Prog -> Term -> Maybe(Rhs, Subst)
+-- findRule1 (Prog prog) term =
+--   myReturn term (myFinder prog term)
+--    where 
+--     myReturn _ Nothing = Nothing
+--     myReturn (Var v) (Just rhs) = Just(rhs, (Subst.single v rhs))
 
-findRule1 :: Prog -> Term -> Maybe(Rhs, Subst)
-findRule1 (Prog prog) term =
-  myReturn term (myFinder prog term)
-   where 
-    myReturn _ Nothing = Nothing
-    myReturn (Var v) (Just rhs) = Just(rhs, (Subst.single v rhs))
+--     myFinder [] _ = Nothing
+--     myFinder ((Rule lhs rhs):s) term
+--       | unifiable term lhs = Just rhs
+--       | otherwise = myFinder s term
 
-    myFinder [] _ = Nothing
-    myFinder ((Rule lhs rhs):s) term
-      | unifiable term lhs = Just rhs
-      | otherwise = myFinder s term
-
-    unifiable specific general = unwrapJust (Matching.match general specific)
-     where
-      unwrapJust Nothing = False
-      unwrapJust (Just _) = True
-
-
+--     unifiable specific general = unwrapJust (Matching.match general specific)
+--      where
+--       unwrapJust Nothing = False
+--       unwrapJust (Just _) = True
 
 testProg1 = Prog [(Rule (Comb "add" [Comb "ZERO" [], Var "m"]) (Var "m"))]
 testTerm1 = (Comb "add" [Comb "ZERO" [], Comb "SUCC" [Comb "SUCC" [Comb "ZERO" []]]])
