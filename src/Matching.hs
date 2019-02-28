@@ -1,3 +1,5 @@
+module Matching (match) where
+
 import Subst
 import Term
 import Pos
