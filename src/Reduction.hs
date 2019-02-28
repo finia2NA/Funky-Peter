@@ -1,49 +1,57 @@
+module Reduction (findRule, reduceAt, reduciblePos, isNormalForm) where
+
 import Matching
 import Prog
 import Term
 import Subst
-import Data.List
+import Pos
 
--- Suche Regel in Prog (Liste von Regeln) für die gilt:
---  - Linke Seite ist == Term
---  - Es existiert match zwischen term und rhs
 
+-- returned die erste Regel, die man auf den Term anwenden kann,
+-- oder Nothing wenn es keine solche Regel gibt.
 findRule:: Prog -> Term -> Maybe(Rhs, Subst)
 findRule (Prog rules) term = foldr reductor Nothing rules
  where
   reductor (Rule lh rh) acc =
     if notNothing acc then acc -- Skip rest if we already have a return value
     else
-    if notNothing (match lh term) && notNothing (match rh term)
-      then Just (rh, (unwrap (match rh term)))
+    if notNothing (match lh term)
+      then Just (rh, (unwrap (match lh term)))
       else Nothing
    where
-    notNothing :: Maybe a -> Bool
-    notNothing (Just _) = True
-    notNothing _        = False
     unwrap :: Maybe a -> a
-    unwrap (Just a) = a  
+    unwrap (Just a) = a 
 
+-- given a term a and a program p, returns a term a' which was reduced at a given pos, 
+-- or nothing if such a reduction was not possible with the given p.
+reduceAt :: Prog -> Term -> Pos -> Maybe Term
+reduceAt prog term pos = let subterm = selectAt term pos in
+  buildReturn (findRule prog subterm)
+ where
+  buildReturn :: Maybe(Rhs, Subst) -> Maybe Term
+  buildReturn (Just (rh, subst)) = Just (replaceAt term pos (apply subst rh))
+  buildReturn _ = Nothing
 
-      
--- findRule1 :: Prog -> Term -> Maybe(Rhs, Subst)
--- findRule1 (Prog prog) term =
---   myReturn term (myFinder prog term)
---    where 
---     myReturn _ Nothing = Nothing
---     myReturn (Var v) (Just rhs) = Just(rhs, (Subst.single v rhs))
+-- returns a list of reducible positions in the given term
+reduciblePos :: Prog -> Term -> [Pos]
+reduciblePos prog term = filter isReduciblePos (allPos term)
+ where
+  isReduciblePos :: Pos -> Bool
+  isReduciblePos pos = notNothing (findRule prog (selectAt term pos))
 
---     myFinder [] _ = Nothing
---     myFinder ((Rule lhs rhs):s) term
---       | unifiable term lhs = Just rhs
---       | otherwise = myFinder s term
+-- is the given term already reduced as much as possible given this program?
+isNormalForm :: Prog -> Term -> Bool
+isNormalForm prog term = length (reduciblePos prog term) == 0 
 
---     unifiable specific general = unwrapJust (Matching.match general specific)
---      where
---       unwrapJust Nothing = False
---       unwrapJust (Just _) = True
+-- helper function for Maybe: returns wether the argument is a Just or a Nothing
+notNothing :: Maybe a -> Bool
+notNothing (Just _) = True
+notNothing _        = False
 
+-- Tests 
 testProg1 = Prog [(Rule (Comb "add" [Comb "ZERO" [], Var "m"]) (Var "m"))]
 testTerm1 = (Comb "add" [Comb "ZERO" [], Comb "SUCC" [Comb "SUCC" [Comb "ZERO" []]]])
-
 test1 f = f testProg1 testTerm1
+
+testProg2 = Prog [(Rule (Comb "add" [Comb "ZERO" [], Var "m"]) (Var "m"))]
+testTerm2 = (Comb "add" [(Var "n"), (Comb "add" [Comb "ZERO" [], Comb "SUCC" [Comb "SUCC" [Comb "ZERO" []]]])])
