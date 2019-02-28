@@ -12,11 +12,14 @@ findRule:: Prog -> Term -> Maybe(Rhs, Subst)
 findRule (Prog rules) term = foldr reductor Nothing rules
  where
   reductor (Rule lh rh) acc =
-    if maybeCompare (match lh term) && maybeCompare(match rh term)
-      then if maybeCompare acc then acc else Just (rh, (unwrap (match rh term)))
-      else if maybeCompare acc then acc else Nothing
-  maybeCompare (Just _) = True
-  maybeCompare _        = False
+    if notNothing acc then acc -- Skip rest if we already have a return value
+    else
+    if notNothing (match lh term) && notNothing (match rh term)
+      then Just (rh, (unwrap (match rh term)))
+      else Nothing
+   where
+    notNothing (Just _) = True
+    notNothing _        = False
 
 
 unwrap :: Maybe a -> a
