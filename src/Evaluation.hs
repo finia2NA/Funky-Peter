@@ -4,6 +4,7 @@ import Reduction
 import Pos
 import Term
 import Prog
+import Util
 import Data.List
 
 {-
@@ -97,9 +98,24 @@ riStrategy = (\prog term -> sortBy strategy (reduciblePos prog term))
 --  where
 --   strategy :: Pos -> Pos -> Ordering
 
+-- Reduces a term using a program at the first position provided by a given strategy
+reduceWith :: Strategy -> Prog -> Term -> Maybe Term
+reduceWith strat prog term
+  | length poss < 1 = Nothing 
+  | otherwise       = reduceAt prog term (poss !! 0)
+   where poss = strat prog term
 
--- reduceWith :: Strategy -> Prog -> Term -> Maybe Term
--- reduceWith str prg trm =
+-- Evaluates a Term with a given Program until it is in its normal form.
+evaluateWith :: Strategy -> Prog -> Term -> Term
+evaluateWith strat prog term
+  | isNormalForm prog term = term
+  | otherwise = evaluateWith strat prog (unwrap (reduceWith strat prog term))
 
--- evaluateWith :: Strategy -> Prog -> Term -> Term
--- evaluateWith str prg trm =yya
+
+-- Tests
+addRules = Prog [Rule (Comb "add" [Comb "ZERO" [], Var "m"]) (Var "m"),
+  Rule (Comb "add" [Comb "SUCC" [Var "n"], Var "m"]) (Comb "SUCC" [Comb "add" [Var "n", Var "m"]])]
+
+term1 = Comb "add" [Comb "ZERO" [], Comb "Zero" []]
+term2 = Comb "add" [Comb "SUCC" [Comb "SUCC" [Comb "ZERO" []]], Comb "SUCC" [Comb "SUCC" [Comb "ZERO" []]]]
+term3 = Comb "add" [Comb "SUCC" [Comb "SUCC" [Comb "ZERO" []]], Comb "add" [Comb "SUCC" [Comb "SUCC" [Comb "ZERO" []]], Comb "SUCC" [Comb "SUCC" [Comb "ZERO" []]]]]
