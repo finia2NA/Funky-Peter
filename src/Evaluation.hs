@@ -15,8 +15,7 @@ innermost:
   Wie in imperativen Sprachen: f(g(x)) -> g wird vor f ausgeführt
 
 outermost:
-  Funktionen werden von ausse
-  n nach innen ausgeführt
+  Funktionen werden von aussen nach innen ausgeführt
   (substituiert). Diese art Auszuwerten ist _mächtiger_ als innermost,
   da das Programm zb bei ```f x = 1 | h = h``` für den Aufruf ```f h``` terminiert
   Es ist allerdings nicht vereinbar mit seiteneffektbehafteten Funktionen und

@@ -5,5 +5,6 @@ notNothing :: Maybe a -> Bool
 notNothing (Just _) = True
 notNothing _        = False
 
+-- Unwraps the Data from a Maybe container. Will throw an exception on Nothing.
 unwrap :: Maybe a -> a
 unwrap (Just a) = a 

@@ -13,7 +13,7 @@ import Pos
 -- Returns a list of substitutions from t1 to t2 if it is possible
 match :: Term -> Term -> Maybe Subst
 match t1 t2 
-  | eap t1 t2 = Just (
+  | etav t1 t2 = Just (
       foldr Subst.compose Subst.identity (
         map (\pos ->
           (\(Var v) -> Subst.single v (Pos.selectAt t2 pos))
@@ -32,8 +32,9 @@ match t1 t2
   ∀var∈t1: ∃term∈t2: t1.pos=t2.pos
   ?
 -}
-eap :: Term -> Term -> Bool
-eap t1 t2 = let baum = (Pos.allPos t2) in
+-- (etav stands for EXISTS TERM at ALL VARIABLES btw)
+etav :: Term -> Term -> Bool
+etav t1 t2 = let baum = (Pos.allPos t2) in
   foldl (helper baum) True (findAllVars t1)
    where
     helper baum prevBool pfad  = prevBool && (elem pfad baum)

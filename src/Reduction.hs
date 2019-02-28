@@ -41,7 +41,8 @@ reduciblePos prog term = filter isReduciblePos (allPos term)
 isNormalForm :: Prog -> Term -> Bool
 isNormalForm prog term = length (reduciblePos prog term) == 0 
 
--- Tests 
+-- =================================== Tests ===================================
+  
 testProg1 = Prog [(Rule (Comb "add" [Comb "ZERO" [], Var "m"]) (Var "m"))]
 testTerm1 = (Comb "add" [Comb "ZERO" [], Comb "SUCC" [Comb "SUCC" [Comb "ZERO" []]]])
 test1 f = f testProg1 testTerm1

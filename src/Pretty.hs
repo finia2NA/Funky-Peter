@@ -4,6 +4,7 @@ module Pretty (Pretty(..)) where
 import Term
 
 class Pretty a where
+  -- displays a given thing in a visually pleasing manner.
   pretty :: a -> String
 
 instance Pretty Term where
