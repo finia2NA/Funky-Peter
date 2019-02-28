@@ -38,22 +38,22 @@ instance Arbitrary Subst where
   -- arbitrary = frequency[(2, genIdentity), (2, genSingle), (1, genCompose)]
   arbitrary = sized asSub
    where
-    asSub :: Int -> Gen (Subst)
+    asSub :: Int -> Gen Subst
     asSub n = do
       composeProb <- choose (0, n)
       re <- frequency[(10, genIdentity), (10, genSingle), (n, genCompose n)]
       return re
 
-    genIdentity :: Gen (Subst)
+    genIdentity :: Gen Subst
     genIdentity = do return identity
 
-    genSingle :: Gen (Subst)
+    genSingle :: Gen Subst
     genSingle = do
       varname <- arbitrary
       term <- arbitrary
       return (single varname term)
 
-    genCompose :: Int ->  Gen (Subst)
+    genCompose :: Int ->  Gen Subst
     genCompose n = do
       s1 <- (asSub (quot n 2))
       s2 <- (asSub (quot n 2))
