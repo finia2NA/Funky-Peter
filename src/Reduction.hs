@@ -22,7 +22,7 @@ findRule (Prog rules) term = foldr reductor Nothing rules
     unwrap :: Maybe a -> a
     unwrap (Just a) = a 
 
--- given a term a and a program p, returns a term a' which was reduced at a given pos, 
+-- given a term t and a program p, returns a term t' which was reduced at a given pos, 
 -- or nothing if such a reduction was not possible with the given p.
 reduceAt :: Prog -> Term -> Pos -> Maybe Term
 reduceAt prog term pos = let subterm = selectAt term pos in

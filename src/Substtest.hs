@@ -35,7 +35,6 @@ instance Arbitrary Term where
 
 -- ============================== arbitrary Subst ==============================
 instance Arbitrary Subst where
-  -- arbitrary = frequency[(2, genIdentity), (2, genSingle), (1, genCompose)]
   arbitrary = sized asSub
    where
     asSub :: Int -> Gen Subst
