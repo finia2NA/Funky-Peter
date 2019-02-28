@@ -32,8 +32,14 @@ instance Arbitrary Term where
         return (currentTerm:xs)
 
 instance Arbitrary Subst where
-  arbitrary = frequency[(1, genIdentity), (1, genSingle), (3, genCompose)]
+  -- arbitrary = frequency[(2, genIdentity), (2, genSingle), (1, genCompose)]
+  arbitrary = sized asSub
    where
+    asSub :: Int -> Gen (Subst)
+    asSub n = do
+      composeProb <- choose (0 .. n)
+      return frequency[(10, genIdentity), (10, genSingle), (n, genCompose)]
+
     genIdentity :: Gen (Subst)
     genIdentity = do return identity
 
@@ -43,7 +49,7 @@ instance Arbitrary Subst where
       term <- arbitrary
       return (single varname term)
 
-    genCompose :: Gen (Subst)
+    genCompose :: Int ->  Gen (Subst)
     genCompose = do
       s1 <- arbitrary
       s2 <- arbitrary

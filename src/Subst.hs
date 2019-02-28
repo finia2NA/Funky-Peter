@@ -16,3 +16,6 @@ compose (Subst f1) (Subst f2) = Subst (f1 . f2)
 apply:: Subst -> Term -> Term
 apply (Subst sub) t@(Var _) = sub t
 apply sub (Comb n xs) = Comb n (map (apply sub) xs)
+
+instance Show Subst where
+  show (Subst _) = "hier steht ein subst"
