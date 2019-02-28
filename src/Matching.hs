@@ -58,6 +58,6 @@ testvar1 = Comb "add" [Comb "Succ" [Comb "Zero" []], Comb "mul" [Var "m", Var "n
 testvar2 = Comb "add" [Comb "Succ" [Comb "Zero" []], Comb "mul" [Comb "Succ" [Comb "Zero" []], Comb "Succ" [Comb "Zero" []]]]
 test2 = apply (unwrap (match testvar1 testvar2)) testvar1
 
-testvar3 = Comb "add" [Var "2", Var "3"]
-testvar4 = Comb "add" [Comb "TWO" [], Comb "THREE" []]
+testvar3 = Comb "add" [Comb "first" [Var "2", Var "3"], Comb "first" [Var "2", Var "3"]]
+testvar4 = Comb "add" [Comb "first" [Comb "TWO" [], Comb "THREE" []], Comb "first" [Comb "TWO" [], Comb "THREE" []]]
 test3 = apply (unwrap (match testvar3 testvar4)) testvar3
