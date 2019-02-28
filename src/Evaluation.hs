@@ -110,3 +110,12 @@ evaluateWith :: Strategy -> Prog -> Term -> Term
 evaluateWith strat prog term
   | isNormalForm prog term = term
   | otherwise = evaluateWith strat prog (unwrap (reduceWith strat prog term))
+
+
+-- Tests
+addRules = Prog [Rule (Comb "add" [Comb "ZERO" [], Var "m"]) (Var "m"),
+  Rule (Comb "add" [Comb "SUCC" [Var "n"], Var "m"]) (Comb "SUCC" [Comb "add" [Var "n", Var "m"]])]
+
+term1 = Comb "add" [Comb "ZERO" [], Comb "Zero" []]
+term2 = Comb "add" [Comb "SUCC" [Comb "SUCC" [Comb "ZERO" []]], Comb "SUCC" [Comb "SUCC" [Comb "ZERO" []]]]
+term3 = Comb "add" [Comb "SUCC" [Comb "SUCC" [Comb "ZERO" []]], Comb "add" [Comb "SUCC" [Comb "SUCC" [Comb "ZERO" []]], Comb "SUCC" [Comb "SUCC" [Comb "ZERO" []]]]]
