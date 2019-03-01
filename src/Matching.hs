@@ -24,25 +24,25 @@ match t1 t2
     )
   | otherwise = Nothing
 
-match2 :: Term -> Term -> Maybe Subst
-match2 t1 t2 
--- wenn es für jede Var ein subst geben wird,
--- dann return ein composed Subst von all diesen.
-  | etav t1 t2 = Just (
-    foldr Subst.compose Subst.identity (map (getSubst t1 t2) (findAllVars t1))
-    )
-  | otherwise = Nothing
- where
-  -- gets the Substitution from t1.pos (which is a var) to t2.pos
-  getSubst :: Term -> Term -> Pos -> Subst
-  getSubst t1 t2 matchedPosition =
-    let grabVar = (selectAt t1 matchedPosition)
-        grabTerm = (selectAt t2 matchedPosition)
-    in helper grabVar grabTerm
-     where
-      -- construct a Subst from a Variable and a Term.
-      helper :: Term -> Term -> Subst
-      helper (Var varname) term = single varname term
+-- match2 :: Term -> Term -> Maybe Subst
+-- match2 t1 t2 
+-- -- wenn es für jede Var ein subst geben wird,
+-- -- dann return ein composed Subst von all diesen.
+--   | etav t1 t2 = Just (
+--     foldr Subst.compose Subst.identity (map (getSubst t1 t2) (findAllVars t1))
+--     )
+--   | otherwise = Nothing
+--  where
+--   -- gets the Substitution from t1.pos (which is a var) to t2.pos
+--   getSubst :: Term -> Term -> Pos -> Subst
+--   getSubst t1 t2 matchedPosition =
+--     let grabVar = (selectAt t1 matchedPosition)
+--         grabTerm = (selectAt t2 matchedPosition)
+--     in helper grabVar grabTerm
+--      where
+--       -- construct a Subst from a Variable and a Term.
+--       helper :: Term -> Term -> Subst
+--       helper (Var varname) term = single varname term
 
 {-
   given two terms t1 and t2,
@@ -68,19 +68,14 @@ findAllVars t = filter (\p -> isVar (Pos.selectAt t p)) (Pos.allPos t)
 
 --------------------- test code ---------------------
 
-unwrap :: Maybe Subst -> Subst
-unwrap (Just s) = s
-unwrap (Nothing) = identity
+-- t11 = Comb "add" [Var "2", Var "3"]
+-- t21 = Comb "add" [Comb "TWO" [], Comb "THREE" []]
+-- test1 = apply (unwrap (match t11 t21)) t11
 
-t11 = Comb "add" [Var "2", Var "3"]
-t21 = Comb "add" [Comb "TWO" [], Comb "THREE" []]
-test1 = apply (unwrap (match t11 t21)) t11
+-- testvar1 = Comb "add" [Comb "Succ" [Comb "Zero" []], Comb "mul" [Var "m", Var "n"]]
+-- testvar2 = Comb "add" [Comb "Succ" [Comb "Zero" []], Comb "mul" [Comb "Succ" [Comb "Zero" []], Comb "Succ" [Comb "Zero" []]]]
+-- test2 = apply (unwrap (match testvar1 testvar2)) testvar1
 
-
-testvar1 = Comb "add" [Comb "Succ" [Comb "Zero" []], Comb "mul" [Var "m", Var "n"]]
-testvar2 = Comb "add" [Comb "Succ" [Comb "Zero" []], Comb "mul" [Comb "Succ" [Comb "Zero" []], Comb "Succ" [Comb "Zero" []]]]
-test2 = apply (unwrap (match testvar1 testvar2)) testvar1
-
-testvar3 = Comb "add" [Comb "first" [Var "2", Var "3"], Comb "first" [Var "2", Var "3"]]
-testvar4 = Comb "add" [Comb "first" [Comb "TWO" [], Comb "THREE" []], Comb "first" [Comb "TWO" [], Comb "THREE" []]]
-test3 = apply (unwrap (match testvar3 testvar4)) testvar3
+-- testvar3 = Comb "add" [Comb "first" [Var "2", Var "3"], Comb "first" [Var "2", Var "3"]]
+-- testvar4 = Comb "add" [Comb "first" [Comb "TWO" [], Comb "THREE" []], Comb "first" [Comb "TWO" [], Comb "THREE" []]]
+-- test3 = apply (unwrap (match testvar3 testvar4)) testvar3
