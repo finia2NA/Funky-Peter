@@ -38,7 +38,10 @@ type Strategy = Prog -> Term -> [Pos]
 
 -- left-outermost
 loStrategy :: Strategy
-loStrategy = (\prog term -> sortBy loOrdering (reduciblePos prog term))
+loStrategy = (\prog term -> if null (reduciblePos prog term) 
+    then [] 
+    else (head (sortBy loOrdering (reduciblePos prog term))) : []
+  )
 loOrdering :: Pos -> Pos -> Ordering
 loOrdering pos1 pos2
   | leftOf  pos1 pos2 = LT
@@ -49,7 +52,10 @@ loOrdering pos1 pos2
 
 -- left-innermost
 liStrategy :: Strategy
-liStrategy = (\prog term -> sortBy liOrdering (reduciblePos prog term))
+liStrategy = (\prog term -> if null (reduciblePos prog term) 
+    then [] 
+    else (head (sortBy liOrdering (reduciblePos prog term))) : []
+  )
 liOrdering :: Pos -> Pos -> Ordering
 liOrdering pos1 pos2
   | leftOf  pos1 pos2 = LT
@@ -60,7 +66,10 @@ liOrdering pos1 pos2
 
 -- right-outermost
 roStrategy :: Strategy
-roStrategy = (\prog term -> sortBy roOrdering (reduciblePos prog term))
+roStrategy = (\prog term -> if null (reduciblePos prog term) 
+    then [] 
+    else (head (sortBy roOrdering (reduciblePos prog term))) : []
+  )
 roOrdering :: Pos -> Pos -> Ordering
 roOrdering pos1 pos2
   | rightOf pos1 pos2 = LT
@@ -71,7 +80,10 @@ roOrdering pos1 pos2
 
 -- right-innermost
 riStrategy :: Strategy
-riStrategy = (\prog term -> sortBy riOrdering (reduciblePos prog term))
+riStrategy = (\prog term -> if null (reduciblePos prog term) 
+    then [] 
+    else (head (sortBy riOrdering (reduciblePos prog term))) : []
+  )
 riOrdering :: Pos -> Pos -> Ordering
 riOrdering pos1 pos2
   | rightOf pos1 pos2 = LT
@@ -83,7 +95,10 @@ riOrdering pos1 pos2
 
 -- parallel outermost
 poStrategy :: Strategy
-poStrategy = (\prog term -> sortBy poOrdering (reduciblePos prog term))
+poStrategy = (\prog term -> if null (reduciblePos prog term) 
+    then [] 
+    else (head (sortBy poOrdering (reduciblePos prog term))) : []
+  )
 poOrdering :: Pos -> Pos -> Ordering
 poOrdering pos1 pos2
   | above   pos1 pos2 = LT
@@ -94,7 +109,10 @@ poOrdering pos1 pos2
 
 -- parallel innermost
 piStrategy :: Strategy
-piStrategy = (\prog term -> sortBy piOrdering (reduciblePos prog term))
+piStrategy = (\prog term -> if null (reduciblePos prog term) 
+    then [] 
+    else (head (sortBy piOrdering (reduciblePos prog term))) : []
+  )
 piOrdering :: Pos -> Pos -> Ordering
 piOrdering pos1 pos2
   | below   pos1 pos2 = LT
@@ -122,6 +140,9 @@ evaluateWith strat prog term
 addRules = Prog [Rule (Comb "add" [Comb "ZERO" [], Var "m"]) (Var "m"),
   Rule (Comb "add" [Comb "SUCC" [Var "n"], Var "m"]) (Comb "SUCC" [Comb "add" [Var "n", Var "m"]])]
 
+dumbRule = Prog [Rule (Var "x") (Var "x")]
+
+term  = Var "m"
 term1 = Comb "add" [Comb "ZERO" [], Comb "Zero" []]
 term2 = Comb "add" [Comb "SUCC" [Comb "SUCC" [Comb "ZERO" []]], Comb "SUCC" [Comb "SUCC" [Comb "ZERO" []]]]
 term3 = Comb "add" [Comb "SUCC" [Comb "SUCC" [Comb "ZERO" []]], Comb "add" [Comb "SUCC" [Comb "SUCC" [Comb "ZERO" []]], Comb "SUCC" [Comb "SUCC" [Comb "ZERO" []]]]]
