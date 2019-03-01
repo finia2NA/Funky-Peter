@@ -50,3 +50,6 @@ test1 f = f testProg1 testTerm1
 testProg2 = Prog [(Rule (Comb "add" [Comb "ZERO" [], Var "m"]) (Var "m")),
                   (Rule (Comb "add" [Comb "SUCC" [Var "n"], Var "m"]) (Comb "SUCC" [Comb "add" [Var "n", Var "m"]]))]
 testTerm2 = (Comb "add" [(Var "n"), (Comb "add" [Comb "ZERO" [], Comb "SUCC" [Comb "SUCC" [Comb "ZERO" []]]])])
+
+testProg3 = Prog [(Rule (Comb "add" [(Comb "ONE" []), (Comb "ONE" [])]) (Comb "TWO" []))]
+testTerm3 = (Comb "mult" [(Comb "ONE" []), (Comb "ONE" [])])
