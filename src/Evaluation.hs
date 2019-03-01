@@ -42,10 +42,10 @@ loStrategy = (\prog term -> sortBy strategy (reduciblePos prog term))
  where
   strategy :: Pos -> Pos -> Ordering
   strategy pos1 pos2
-    | above   pos1 pos2 = LT
-    | below   pos1 pos2 = GT
     | leftOf  pos1 pos2 = LT
     | rightOf pos1 pos2 = GT
+    | above   pos1 pos2 = LT
+    | below   pos1 pos2 = GT
     | otherwise = error "error found by strategy ™"
 
 -- left-innermost
@@ -54,10 +54,10 @@ liStrategy = (\prog term -> sortBy strategy (reduciblePos prog term))
  where
   strategy :: Pos -> Pos -> Ordering
   strategy pos1 pos2
-    | below   pos1 pos2 = LT
-    | above   pos1 pos2 = GT
     | leftOf  pos1 pos2 = LT
     | rightOf pos1 pos2 = GT
+    | below   pos1 pos2 = LT
+    | above   pos1 pos2 = GT
     | otherwise = error "error found by strategy ™"
 
 -- right-outermost
@@ -66,10 +66,10 @@ roStrategy = (\prog term -> sortBy strategy (reduciblePos prog term))
  where
   strategy :: Pos -> Pos -> Ordering
   strategy pos1 pos2
-    | above   pos1 pos2 = LT
-    | below   pos1 pos2 = GT
     | rightOf pos1 pos2 = LT
     | leftOf  pos1 pos2 = GT
+    | above   pos1 pos2 = LT
+    | below   pos1 pos2 = GT
     | otherwise = error "error found by strategy ™"
 
 -- right-innermost
@@ -78,10 +78,10 @@ riStrategy = (\prog term -> sortBy strategy (reduciblePos prog term))
  where
   strategy :: Pos -> Pos -> Ordering
   strategy pos1 pos2
-    | below   pos1 pos2 = LT
-    | above   pos1 pos2 = GT
     | rightOf pos1 pos2 = LT
     | leftOf  pos1 pos2 = GT
+    | below   pos1 pos2 = LT
+    | above   pos1 pos2 = GT
     | otherwise = error "error found by strategy ™"
 
 

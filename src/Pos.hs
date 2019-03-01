@@ -14,11 +14,15 @@ below pos1 pos2 = length pos2 < length pos1 && pos2 == (take (length pos2) pos1)
 
 -- is pos1 left of pos2?
 leftOf :: Pos -> Pos -> Bool
-leftOf pos1 pos2  = (init pos1 == init pos2) && (last pos1) < (last pos2)
+leftOf pos1 pos2
+  | (p1 : ps1) (p2 : ps2) = p1 < p2 || leftOf ps1 ps2
+  | _          _          = False
   
 -- is pos1 right of pos2?
 rightOf :: Pos -> Pos -> Bool
-rightOf pos1 pos2 = (init pos1 == init pos2) && (last pos1) > (last pos2)
+rightOf pos1 pos2
+  | (p1 : ps1) (p2 : ps2) = p1 > p2 || rightOf ps1 ps2
+  | _          _          = False
 
 -- returns the subterm at a given position
 selectAt :: Term -> Pos -> Term
