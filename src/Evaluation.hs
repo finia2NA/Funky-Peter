@@ -38,64 +38,71 @@ type Strategy = Prog -> Term -> [Pos]
 
 -- left-outermost
 loStrategy :: Strategy
-loStrategy = (\prog term -> sortBy strategy (reduciblePos prog term))
- where
-  strategy :: Pos -> Pos -> Ordering
-  strategy pos1 pos2
-    | leftOf  pos1 pos2 = LT
-    | rightOf pos1 pos2 = GT
-    | above   pos1 pos2 = LT
-    | below   pos1 pos2 = GT
-    | otherwise = error "error found by strategy ™"
+loStrategy = (\prog term -> sortBy loOrdering (reduciblePos prog term))
+loOrdering :: Pos -> Pos -> Ordering
+loOrdering pos1 pos2
+  | leftOf  pos1 pos2 = LT
+  | rightOf pos1 pos2 = GT
+  | above   pos1 pos2 = LT
+  | below   pos1 pos2 = GT
+  | otherwise = error "error found by strategy ™"
 
 -- left-innermost
 liStrategy :: Strategy
-liStrategy = (\prog term -> sortBy strategy (reduciblePos prog term))
- where
-  strategy :: Pos -> Pos -> Ordering
-  strategy pos1 pos2
-    | leftOf  pos1 pos2 = LT
-    | rightOf pos1 pos2 = GT
-    | below   pos1 pos2 = LT
-    | above   pos1 pos2 = GT
-    | otherwise = error "error found by strategy ™"
+liStrategy = (\prog term -> sortBy liOrdering (reduciblePos prog term))
+liOrdering :: Pos -> Pos -> Ordering
+liOrdering pos1 pos2
+  | leftOf  pos1 pos2 = LT
+  | rightOf pos1 pos2 = GT
+  | below   pos1 pos2 = LT
+  | above   pos1 pos2 = GT
+  | otherwise = error "error found by strategy ™"
 
 -- right-outermost
 roStrategy :: Strategy
-roStrategy = (\prog term -> sortBy strategy (reduciblePos prog term))
- where
-  strategy :: Pos -> Pos -> Ordering
-  strategy pos1 pos2
-    | rightOf pos1 pos2 = LT
-    | leftOf  pos1 pos2 = GT
-    | above   pos1 pos2 = LT
-    | below   pos1 pos2 = GT
-    | otherwise = error "error found by strategy ™"
+roStrategy = (\prog term -> sortBy roOrdering (reduciblePos prog term))
+roOrdering :: Pos -> Pos -> Ordering
+roOrdering pos1 pos2
+  | rightOf pos1 pos2 = LT
+  | leftOf  pos1 pos2 = GT
+  | above   pos1 pos2 = LT
+  | below   pos1 pos2 = GT
+  | otherwise = error "error found by strategy ™"
 
 -- right-innermost
 riStrategy :: Strategy
-riStrategy = (\prog term -> sortBy strategy (reduciblePos prog term))
- where
-  strategy :: Pos -> Pos -> Ordering
-  strategy pos1 pos2
-    | rightOf pos1 pos2 = LT
-    | leftOf  pos1 pos2 = GT
-    | below   pos1 pos2 = LT
-    | above   pos1 pos2 = GT
-    | otherwise = error "error found by strategy ™"
+riStrategy = (\prog term -> sortBy riOrdering (reduciblePos prog term))
+riOrdering :: Pos -> Pos -> Ordering
+riOrdering pos1 pos2
+  | rightOf pos1 pos2 = LT
+  | leftOf  pos1 pos2 = GT
+  | below   pos1 pos2 = LT
+  | above   pos1 pos2 = GT
+  | otherwise = error "error found by strategy ™"
 
 
--- -- parallel outermost
--- poStrategy :: Strategy
--- poStrategy = (\prog term -> sortBy strategy (reduciblePos prog term))
---  where
---   strategy :: Pos -> Pos -> Ordering
+-- parallel outermost
+poStrategy :: Strategy
+poStrategy = (\prog term -> sortBy poOrdering (reduciblePos prog term))
+poOrdering :: Pos -> Pos -> Ordering
+poOrdering pos1 pos2
+  | above   pos1 pos2 = LT
+  | below   pos1 pos2 = GT
+  | rightOf pos1 pos2 = LT
+  | leftOf  pos1 pos2 = GT
+  | otherwise = error "error found by strategy ™"
 
--- -- parallel innermost
--- piStrategy :: Strategy
--- piStrategy = (\prog term -> sortBy strategy (reduciblePos prog term))
---  where
---   strategy :: Pos -> Pos -> Ordering
+-- parallel innermost
+piStrategy :: Strategy
+piStrategy = (\prog term -> sortBy piOrdering (reduciblePos prog term))
+piOrdering :: Pos -> Pos -> Ordering
+piOrdering pos1 pos2
+  | below   pos1 pos2 = LT
+  | above   pos1 pos2 = GT
+  | rightOf pos1 pos2 = LT
+  | leftOf  pos1 pos2 = GT
+  | otherwise = error "error found by strategy ™"
+
 
 -- Reduces a term using a program at the first position provided by a given strategy
 reduceWith :: Strategy -> Prog -> Term -> Maybe Term
@@ -118,3 +125,5 @@ addRules = Prog [Rule (Comb "add" [Comb "ZERO" [], Var "m"]) (Var "m"),
 term1 = Comb "add" [Comb "ZERO" [], Comb "Zero" []]
 term2 = Comb "add" [Comb "SUCC" [Comb "SUCC" [Comb "ZERO" []]], Comb "SUCC" [Comb "SUCC" [Comb "ZERO" []]]]
 term3 = Comb "add" [Comb "SUCC" [Comb "SUCC" [Comb "ZERO" []]], Comb "add" [Comb "SUCC" [Comb "SUCC" [Comb "ZERO" []]], Comb "SUCC" [Comb "SUCC" [Comb "ZERO" []]]]]
+
+-- paperterm = (Comb "root" [])

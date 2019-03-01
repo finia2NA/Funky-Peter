@@ -39,7 +39,7 @@ reduciblePos prog term = filter isReduciblePos (allPos term)
 
 -- is the given term already reduced as much as possible given this program?
 isNormalForm :: Prog -> Term -> Bool
-isNormalForm prog term = length (reduciblePos prog term) == 0 
+isNormalForm prog term = null (reduciblePos prog term)
 
 -- =================================== Tests ===================================
   

@@ -1,4 +1,4 @@
-module Matching (match) where
+module Matching (match, matchV) where
 
 import Subst
 import Term
