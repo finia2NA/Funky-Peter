@@ -29,19 +29,20 @@ match2 t1 t2
 -- wenn es für jede Var ein subst geben wird,
 -- dann return ein composed Subst von all diesen.
   | etav t1 t2 = Just (
-    foldr Subst.compose Subst.identity (map (helper t1 t2) (findAllVars t1))
+    foldr Subst.compose Subst.identity (map (getSubst t1 t2) (findAllVars t1))
     )
   | otherwise = Nothing
  where
-  helper :: Term -> Term -> Pos -> Subst
-  helper t1 t2 matchedPosition =
+  -- gets the Substitution from t1.pos (which is a var) to t2.pos
+  getSubst :: Term -> Term -> Pos -> Subst
+  getSubst t1 t2 matchedPosition =
     let grabVar = (selectAt t1 matchedPosition)
         grabTerm = (selectAt t2 matchedPosition)
-    in helper2 grabVar grabTerm
-    -- construct a Subst from a Variable and a Term.
+    in helper grabVar grabTerm
      where
-      helper2 :: Term -> Term -> Subst
-      helper2 (Var varname) term = single varname term
+      -- construct a Subst from a Variable and a Term.
+      helper :: Term -> Term -> Subst
+      helper (Var varname) term = single varname term
 
 {-
   given two terms t1 and t2,
