@@ -5,7 +5,7 @@ import Pos
 import Term
 import Prog
 import Util
-import Data.List
+import qualified Data.List as List
 
 {-
 WIKI:
@@ -40,8 +40,9 @@ type Strategy = Prog -> Term -> [Pos]
 loStrategy :: Strategy
 loStrategy = (\prog term -> if null (reduciblePos prog term) 
     then [] 
-    else (head (sortBy loOrdering (reduciblePos prog term))) : []
+    else (head (List.sortBy loOrdering (reduciblePos prog term))) : []
   )
+
 loOrdering :: Pos -> Pos -> Ordering
 loOrdering pos1 pos2
   | leftOf  pos1 pos2 = LT
@@ -54,8 +55,9 @@ loOrdering pos1 pos2
 liStrategy :: Strategy
 liStrategy = (\prog term -> if null (reduciblePos prog term) 
     then [] 
-    else (head (sortBy liOrdering (reduciblePos prog term))) : []
+    else (head (List.sortBy liOrdering (reduciblePos prog term))) : []
   )
+
 liOrdering :: Pos -> Pos -> Ordering
 liOrdering pos1 pos2
   | leftOf  pos1 pos2 = LT
@@ -68,8 +70,9 @@ liOrdering pos1 pos2
 roStrategy :: Strategy
 roStrategy = (\prog term -> if null (reduciblePos prog term) 
     then [] 
-    else (head (sortBy roOrdering (reduciblePos prog term))) : []
+    else (head (List.sortBy roOrdering (reduciblePos prog term))) : []
   )
+
 roOrdering :: Pos -> Pos -> Ordering
 roOrdering pos1 pos2
   | rightOf pos1 pos2 = LT
@@ -82,8 +85,9 @@ roOrdering pos1 pos2
 riStrategy :: Strategy
 riStrategy = (\prog term -> if null (reduciblePos prog term) 
     then [] 
-    else (head (sortBy riOrdering (reduciblePos prog term))) : []
+    else (head (List.sortBy riOrdering (reduciblePos prog term))) : []
   )
+
 riOrdering :: Pos -> Pos -> Ordering
 riOrdering pos1 pos2
   | rightOf pos1 pos2 = LT
@@ -95,39 +99,47 @@ riOrdering pos1 pos2
 
 -- parallel outermost
 poStrategy :: Strategy
-poStrategy = (\prog term -> if null (reduciblePos prog term) 
-    then [] 
-    else (head (sortBy poOrdering (reduciblePos prog term))) : []
-  )
+poStrategy = (\prog term -> getMinPosis (reduciblePos prog term))
+ where
+  getMinPosis :: [Pos] -> [Pos]
+  getMinPosis [] = []
+  getMinPosis ps = let min = head (List.sortBy poOrdering ps) in
+    filter (\p -> length p == length min) ps
+
 poOrdering :: Pos -> Pos -> Ordering
 poOrdering pos1 pos2
   | above   pos1 pos2 = LT
   | below   pos1 pos2 = GT
-  | rightOf pos1 pos2 = LT
-  | leftOf  pos1 pos2 = GT
-  | otherwise = error "error found by strategy ™"
+  | otherwise = EQ
 
 -- parallel innermost
 piStrategy :: Strategy
-piStrategy = (\prog term -> if null (reduciblePos prog term) 
-    then [] 
-    else (head (sortBy piOrdering (reduciblePos prog term))) : []
-  )
+piStrategy = (\prog term -> getMinPosis (reduciblePos prog term))
+ where
+  getMinPosis :: [Pos] -> [Pos]
+  getMinPosis [] = []
+  getMinPosis ps = let min = head (List.sortBy piOrdering ps) in
+    filter (\p -> length p == length min) ps
+
 piOrdering :: Pos -> Pos -> Ordering
 piOrdering pos1 pos2
   | below   pos1 pos2 = LT
   | above   pos1 pos2 = GT
-  | rightOf pos1 pos2 = LT
-  | leftOf  pos1 pos2 = GT
-  | otherwise = error "error found by strategy ™"
-
+  | otherwise = EQ
 
 -- Reduces a term using a program at the first position provided by a given strategy
 reduceWith :: Strategy -> Prog -> Term -> Maybe Term
 reduceWith strat prog term
-  | length poss < 1 = Nothing 
-  | otherwise       = reduceAt prog term (poss !! 0)
-   where poss = strat prog term
+  | null stratPlan = Nothing 
+  | otherwise = foldr (\pos acc -> if notNothing acc 
+      then reduceAt prog (unwrap acc) pos 
+      else reduceAt prog term pos
+    )
+    Nothing stratPlan
+   where
+    stratPlan :: [Pos]
+    stratPlan = strat prog term
+
 
 -- Evaluates a Term with a given Program until it is in its normal form.
 evaluateWith :: Strategy -> Prog -> Term -> Term
@@ -140,11 +152,13 @@ evaluateWith strat prog term
 addRules = Prog [Rule (Comb "add" [Comb "ZERO" [], Var "m"]) (Var "m"),
   Rule (Comb "add" [Comb "SUCC" [Var "n"], Var "m"]) (Comb "SUCC" [Comb "add" [Var "n", Var "m"]])]
 
-dumbRule = Prog [Rule (Var "x") (Var "x")]
+dumbRules = Prog [Rule (Var "x") (Var "x")]
 
 term  = Var "m"
 term1 = Comb "add" [Comb "ZERO" [], Comb "Zero" []]
 term2 = Comb "add" [Comb "SUCC" [Comb "SUCC" [Comb "ZERO" []]], Comb "SUCC" [Comb "SUCC" [Comb "ZERO" []]]]
 term3 = Comb "add" [Comb "SUCC" [Comb "SUCC" [Comb "ZERO" []]], Comb "add" [Comb "SUCC" [Comb "SUCC" [Comb "ZERO" []]], Comb "SUCC" [Comb "SUCC" [Comb "ZERO" []]]]]
 
--- paperterm = (Comb "root" [])
+stupidRule = Prog [(Rule (Comb "add" [(Var "n"), (Var "m")]) (Comb "plus" [(Var "n"), (Var "m")])), (Rule (Comb "plus" [(Var "n"), (Var "m")]) (Comb "plüs" [(Var "n"), (Var "m")]))]
+
+stupidTerm = Comb "add" [Comb "ZERO" [], Comb "ZERO" []]
