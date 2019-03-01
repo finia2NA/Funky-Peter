@@ -24,4 +24,4 @@ apply sub (Comb n xs) = Comb n (map (apply sub) xs)
 
 -- a show instance for substitutions so QuickCheck works
 instance Show Subst where
-  show (Subst _) = "hier steht ein subst"
+  show (Subst _) = "aSubst"

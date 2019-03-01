@@ -32,19 +32,19 @@ match t1 t2
       helper (Var varname) term = single varname term
 
 
--- -- Returns a list of substitutions from t1 to t2 if it is possible
--- match :: Term -> Term -> Maybe Subst
--- match t1 t2 
---   | etav t1 t2 = Just (
---       foldr Subst.compose Subst.identity (
---         map (\pos ->
---           (\(Var v) -> Subst.single v (Pos.selectAt t2 pos))
---           $ (Pos.selectAt t1 pos)
---           )
---           (findAllVars t1)
---       )
---     )
---   | otherwise = Nothing
+-- Returns a list of substitutions from t1 to t2 if it is possible
+match2 :: Term -> Term -> Maybe Subst
+match2 t1 t2 
+  | etav t1 t2 = Just (
+      foldr Subst.compose Subst.identity (
+        map (\pos ->
+          (\(Var v) -> Subst.single v (Pos.selectAt t2 pos))
+          $ (Pos.selectAt t1 pos)
+          )
+          (findAllVars t1)
+      )
+    )
+  | otherwise = Nothing
 
       {-
       given two terms t1 and t2,
@@ -82,3 +82,12 @@ findAllVars t = filter (\p -> isVar (Pos.selectAt t p)) (Pos.allPos t)
 -- testvar4 = Comb "add" [Comb "first" [Comb "TWO" [], Comb "THREE" []], Comb "first" [Comb "TWO" [], Comb "THREE" []]]
 -- test3 = apply (unwrap (match testvar3 testvar4)) testvar3
 
+
+testT1 = Comb "add" [(Comb "ONE" []), (Comb "ONE" [])]
+testT2 = Comb "mult" [(Comb "ONE" []), (Comb "ONE" [])]
+
+testT3 = Comb "SUCC" [Comb "SUCC" [Comb "SUCC" [Var "m"]]]
+testT4 = Comb "SUCC" [Comb "SUC" [Comb "SUCC" [Comb "ZERO" []]]]
+
+testV1 = Comb "SUCC" [(Comb "a" []), (Var "x")]
+testV2 = Comb "PRE" [(Comb "a" []), (Comb "y" [])]

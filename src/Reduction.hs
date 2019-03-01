@@ -7,7 +7,6 @@ import Subst
 import Pos
 import Util
 
-
 -- returned die erste Regel, die man auf den Term anwenden kann,
 -- oder Nothing wenn es keine solche Regel gibt.
 findRule:: Prog -> Term -> Maybe(Rhs, Subst)
@@ -16,9 +15,10 @@ findRule (Prog rules) term = foldr reductor Nothing rules
   reductor (Rule lh rh) acc =
     if notNothing acc then acc -- Skip rest if we already have a return value
     else
-    if notNothing (match lh term)
-      then Just (rh, (unwrap (match lh term)))
+    if notNothing (applyableSubst)
+      then Just (rh, (unwrap (applyableSubst)))
       else Nothing
+   where applyableSubst = match lh term
 
 -- given a term t and a program p, returns a term t' which was reduced at a given pos, 
 -- or nothing if such a reduction was not possible with the given p.
