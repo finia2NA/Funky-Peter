@@ -13,7 +13,7 @@ instance Pretty Term where
   pretty (Comb name xs) = name ++ (foldl helper "" xs)
    where
     helper oldstring term = oldstring ++ " " ++ (pretty' term)
-    pretty' x@(Var a) = pretty x
-    pretty' x@(Comb name []) = pretty x
+    pretty' x@(Var _) = pretty x
+    pretty' x@(Comb _ []) = pretty x
     -- Put brackets arround inner function calls
-    pretty' (Comb name xs) = "(" ++ name ++ (foldl helper "" xs) ++ ")"
+    pretty' (Comb name' xs') = "(" ++ name' ++ (foldl helper "" xs') ++ ")"

@@ -8,3 +8,4 @@ notNothing _        = False
 -- Unwraps the Data from a Maybe container. Will throw an exception on Nothing.
 unwrap :: Maybe a -> a
 unwrap (Just a) = a 
+unwrap Nothing = error "what the fuck did you just bring upon this cursed land?"

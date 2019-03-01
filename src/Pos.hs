@@ -24,16 +24,18 @@ rightOf pos1 pos2 = (init pos1 == init pos2) && (last pos1) > (last pos2)
 selectAt :: Term -> Pos -> Term
 selectAt term [] = term
 selectAt (Comb _ xs) (p:ps) = selectAt (xs !! p) ps
+selectAt (Var _) (_:_) = error "error in POS: you tried going deeper in a Variable, which is not possible"
 
 -- switches out a subterm at a given position.
 replaceAt :: Term -> Pos -> Term -> Term
-replaceAt src [] rpl = rpl
+replaceAt _ [] rpl = rpl
 replaceAt (Comb n sl) (p:ps) rpl = let (x, (y: ys)) = splitAt p sl in
   Comb n (x ++ [(replaceAt y ps rpl)] ++ ys)
+replaceAt (Var _) (_:_) _ = error "error in POS: you tried going deeper in a Variable, which is not possible"
 
 -- returns a list of all Possible Positions within the Term.
 allPos :: Term -> [Pos]
-allPos (Var v) = [[]]
-allPos (Comb c xs) = let li = (length xs) - 1 in -- li = lastIndex
+allPos (Var _) = [[]]
+allPos (Comb _ xs) = let li = (length xs) - 1 in -- li = lastIndex
    [[]] -- the path that ends here
    ++ [(a:s) | a <- [0 .. li], s <- (allPos (xs !! a))] -- Paths to all children
