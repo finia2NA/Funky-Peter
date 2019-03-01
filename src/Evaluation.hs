@@ -1,4 +1,9 @@
-module Evaluation where
+module Evaluation (
+  loStrategy,
+  liStrategy,    riStrategy, roStrategy,
+  piStrategy,
+  poStrategy, evaluateWith
+) where
 
 import Reduction
 import Pos
