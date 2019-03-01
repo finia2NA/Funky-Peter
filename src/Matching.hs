@@ -3,6 +3,7 @@ module Matching (match) where
 import Subst
 import Term
 import Pos
+import Data.List
 
 -- TODO:
 -- 1. Find (Vars _) in t1 ✔
@@ -30,6 +31,36 @@ match t1 t2
       -- construct a Subst from a Variable and a Term.
       helper :: Term -> Term -> Subst
       helper (Var varname) term = single varname term
+
+-- Returns a list of substitutions from t1 to t2 if it is possible
+matchV :: Term -> Term -> Maybe Subst
+matchV t1 t2 
+-- wenn es für jede Var ein subst geben wird,
+-- dann return ein composed Subst von all diesen.
+  | (etav t1 t2) && (ace t1 t2) = Just (
+  foldr Subst.compose Subst.identity (map (getSubst t1 t2) (findAllVars t1))
+  )
+  | otherwise = Nothing
+  where
+    -- gets the Substitution from t1.pos (which is a var) to t2.pos
+  getSubst :: Term -> Term -> Pos -> Subst
+  getSubst t1 t2 matchedPosition =
+    let grabVar = (selectAt t1 matchedPosition)
+        grabTerm = (selectAt t2 matchedPosition)
+    in helper grabVar grabTerm
+    where
+      -- construct a Subst from a Variable and a Term.
+      helper :: Term -> Term -> Subst
+      helper (Var varname) term = single varname term
+
+ace :: Term -> Term -> Bool
+ace t1 t2  = let allCombs = (allPos t1) \\ (findAllVars t1) in
+  foldl helper True allCombs
+  where
+    helper bool pos = bool && (sameStructure (selectAt t1 pos) (selectAt t2 pos))
+    sameStructure (Comb n1 l1) (Comb n2 l2) = n1==n2 && (length l1)==(length l2)
+
+
 
 
 -- Returns a list of substitutions from t1 to t2 if it is possible
@@ -87,7 +118,7 @@ testT1 = Comb "add" [(Comb "ONE" []), (Comb "ONE" [])]
 testT2 = Comb "mult" [(Comb "ONE" []), (Comb "ONE" [])]
 
 testT3 = Comb "SUCC" [Comb "SUCC" [Comb "SUCC" [Var "m"]]]
-testT4 = Comb "SUCC" [Comb "SUC" [Comb "SUCC" [Comb "ZERO" []]]]
+testT4 = Comb "SUCC" [Comb "SUCC" [Comb "SUCC" [Comb "ZERO" []]]]
 
-testV1 = Comb "SUCC" [(Comb "a" []), (Var "x")]
-testV2 = Comb "PRE" [(Comb "a" []), (Comb "y" [])]
+testV1 = Comb "hi" [(Var "x")]
+testV2 = Comb "ho" [(Comb "y" [])]
