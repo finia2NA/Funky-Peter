@@ -18,8 +18,8 @@ setStrategy (State _ prog) strategy = State strategy prog
 getStrategy :: State -> Strategy
 getStrategy (State strat _) = strat
 
-setProgram :: State -> Prog -> Name -> Path -> State
-setProgram (State strat _) prog name path = State strat (name, prog, Just path)
+setProgram :: State -> Name -> Prog -> Maybe Path -> State
+setProgram (State strat _) name prog path = State strat (name, prog, path)
 
 getProgram :: State -> Prog
 getProgram (State _ (_, prog, _)) = prog

@@ -1,8 +1,10 @@
+import System.FilePath.Posix
 import Parser
 import State
 import Evaluation
 import Pretty
 import Util
+import Prog
 
 -- main :: IO ()
 
@@ -33,6 +35,7 @@ getUserInput progName = do
   getLine
 
 handleInput :: State -> String -> IO (Maybe State)
+handleInput state []    = return (Just state)
 handleInput state input =
   case input of
     (':':_) -> parseCommand state (tail input)
@@ -55,34 +58,61 @@ parseCommand state command
   | head command == 'q' = return Nothing
   | head command == 'h' = printHelp >> return (Just state)
   | head command == 's' = updateStrategy state command
-  -- | head command == 'r' = Just (setProgram state )
-  -- | head command == 'l'=
+  | head command == 'l' = loadFile state command
+  | head command == 'r' = reloadFile state
   | otherwise = putStrLn "Unknown command! Enter \":h\" for a list of available commands." >> return (Just state)
-
 
 updateStrategy :: State -> String -> IO (Maybe State)
 updateStrategy state cmd = do
+-- words is predefined Prelude func. Splits a string at the whitespaces into a list
   let args = words cmd
   if length args <= 1
     then putStrLn ("No strategy specified." ++
       "Enter \":h\" for a list of available strategies.") >> return (Just state)
     else do
       let maybeStrat = parseStrategy (args !! 1)
-      if notNothing maybeStrat
+      if Util.notNothing maybeStrat
         then putStrLn ("Strategy updated to: " ++ (args !! 1)) >> 
-          return (Just (setStrategy state (unwrap maybeStrat)))
+          return (Just (State.setStrategy state (Util.unwrap maybeStrat)))
         else putStrLn ("Unkown strategy." ++
         "Enter \":h\" for a list of available strategies.") >> return (Just state)
  where
   parseStrategy :: String -> Maybe Strategy
   parseStrategy strat 
-    | strat == "lo" = Just loStrategy
-    | strat == "li" = Just liStrategy
-    | strat == "ro" = Just roStrategy
-    | strat == "ri" = Just riStrategy
-    | strat == "po" = Just poStrategy
-    | strat == "pi" = Just piStrategy
+    | strat == "lo" = Just Evaluation.loStrategy
+    | strat == "li" = Just Evaluation.liStrategy
+    | strat == "ro" = Just Evaluation.roStrategy
+    | strat == "ri" = Just Evaluation.riStrategy
+    | strat == "po" = Just Evaluation.poStrategy
+    | strat == "pi" = Just Evaluation.piStrategy
     | otherwise     = Nothing
+
+loadFile :: State -> String -> IO (Maybe State)
+loadFile state cmd = do
+  let args = words cmd
+  if length args <= 1
+    -- No path provided. We should unlaod the file if one is loaded.
+    then if Util.notNothing (State.getPath state)
+      then putStrLn ("File unloaded.") >>
+        return (Just (State.setProgram state "" (Prog []) Nothing))
+      else putStrLn ("No file loaded!") >> return (Just state)
+    else do
+      -- Path provided. Let's load that file.
+      let filePath = args !! 1
+      eitherProg <- Parser.parseFile filePath
+      case eitherProg of
+        (Left msg) -> putStrLn msg >> return (Just state)
+        (Right prog) -> putStrLn ("File loaded.") >>
+          return (Just 
+            (State.setProgram state (takeBaseName filePath) prog (Just filePath))
+          )
+
+reloadFile :: State -> IO (Maybe State)
+reloadFile state = let path = (State.getPath state) in
+  if Util.notNothing path
+    then loadFile state ("l " ++ (Util.unwrap path))
+    else putStrLn ("Reloading something that does not exists is pretty much useless.") 
+      >> return (Just state)
 
 printHelp :: IO()
 printHelp = do
