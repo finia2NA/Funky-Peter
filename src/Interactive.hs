@@ -103,9 +103,8 @@ loadFile state cmd = do
       case eitherProg of
         (Left msg) -> putStrLn msg >> return (Just state)
         (Right prog) -> putStrLn ("File loaded.") >>
-          return (Just 
-            (State.setProgram state (takeBaseName filePath) prog (Just filePath))
-          )
+          return (Just (State.setProgram state 
+            (System.FilePath.Posix.takeBaseName filePath) prog (Just filePath)))
 
 reloadFile :: State -> IO (Maybe State)
 reloadFile state = let path = (State.getPath state) in
