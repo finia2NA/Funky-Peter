@@ -1,8 +1,12 @@
 module Evaluation (
+  Strategy,
   loStrategy,
-  liStrategy,    riStrategy, roStrategy,
+  liStrategy,
+  riStrategy,
+  roStrategy,
   piStrategy,
-  poStrategy, evaluateWith
+  poStrategy,
+  evaluateWith
 ) where
 
 import Reduction
@@ -108,8 +112,8 @@ poStrategy = (\prog term -> getMinPosis (reduciblePos prog term))
  where
   getMinPosis :: [Pos] -> [Pos]
   getMinPosis [] = []
-  getMinPosis ps = let min = head (List.sortBy poOrdering ps) in
-    filter (\p -> length p == length min) ps
+  getMinPosis ps = let mini = head (List.sortBy poOrdering ps) in
+    filter (\p -> length p == length mini) ps
 
 poOrdering :: Pos -> Pos -> Ordering
 poOrdering pos1 pos2
@@ -123,8 +127,8 @@ piStrategy = (\prog term -> getMinPosis (reduciblePos prog term))
  where
   getMinPosis :: [Pos] -> [Pos]
   getMinPosis [] = []
-  getMinPosis ps = let min = head (List.sortBy piOrdering ps) in
-    filter (\p -> length p == length min) ps
+  getMinPosis ps = let mini = head (List.sortBy piOrdering ps) in
+    filter (\p -> length p == length mini) ps
 
 piOrdering :: Pos -> Pos -> Ordering
 piOrdering pos1 pos2
@@ -153,17 +157,17 @@ evaluateWith strat prog term
   | otherwise = evaluateWith strat prog (unwrap (reduceWith strat prog term))
 
 
--- Tests
-addRules = Prog [Rule (Comb "add" [Comb "ZERO" [], Var "m"]) (Var "m"),
-  Rule (Comb "add" [Comb "SUCC" [Var "n"], Var "m"]) (Comb "SUCC" [Comb "add" [Var "n", Var "m"]])]
+-- -- Tests
+-- addRules = Prog [Rule (Comb "add" [Comb "ZERO" [], Var "m"]) (Var "m"),
+--   Rule (Comb "add" [Comb "SUCC" [Var "n"], Var "m"]) (Comb "SUCC" [Comb "add" [Var "n", Var "m"]])]
 
-dumbRules = Prog [Rule (Var "x") (Var "x")]
+-- dumbRules = Prog [Rule (Var "x") (Var "x")]
 
-term  = Var "m"
-term1 = Comb "add" [Comb "ZERO" [], Comb "Zero" []]
-term2 = Comb "add" [Comb "SUCC" [Comb "SUCC" [Comb "ZERO" []]], Comb "SUCC" [Comb "SUCC" [Comb "ZERO" []]]]
-term3 = Comb "add" [Comb "SUCC" [Comb "SUCC" [Comb "ZERO" []]], Comb "add" [Comb "SUCC" [Comb "SUCC" [Comb "ZERO" []]], Comb "SUCC" [Comb "SUCC" [Comb "ZERO" []]]]]
+-- term  = Var "m"
+-- term1 = Comb "add" [Comb "ZERO" [], Comb "Zero" []]
+-- term2 = Comb "add" [Comb "SUCC" [Comb "SUCC" [Comb "ZERO" []]], Comb "SUCC" [Comb "SUCC" [Comb "ZERO" []]]]
+-- term3 = Comb "add" [Comb "SUCC" [Comb "SUCC" [Comb "ZERO" []]], Comb "add" [Comb "SUCC" [Comb "SUCC" [Comb "ZERO" []]], Comb "SUCC" [Comb "SUCC" [Comb "ZERO" []]]]]
 
-stupidRule = Prog [(Rule (Comb "add" [(Var "n"), (Var "m")]) (Comb "plus" [(Var "n"), (Var "m")])), (Rule (Comb "plus" [(Var "n"), (Var "m")]) (Comb "plüs" [(Var "n"), (Var "m")]))]
+-- stupidRule = Prog [(Rule (Comb "add" [(Var "n"), (Var "m")]) (Comb "plus" [(Var "n"), (Var "m")])), (Rule (Comb "plus" [(Var "n"), (Var "m")]) (Comb "plüs" [(Var "n"), (Var "m")]))]
 
-stupidTerm = Comb "add" [Comb "ZERO" [], Comb "ZERO" []]
+-- stupidTerm = Comb "add" [Comb "ZERO" [], Comb "ZERO" []]
