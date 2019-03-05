@@ -9,12 +9,13 @@ module Evaluation (
   evaluateWith
 ) where
 
-import Reduction
-import Pos
-import Term
-import Prog
-import Util
 import qualified Data.List as List
+
+import Pos
+import Prog
+import Reduction
+import Term
+import Util
 
 {-
 WIKI:
