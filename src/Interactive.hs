@@ -62,7 +62,9 @@ parseAndEvalExpression state expr = do
 -- | interprets a given string as a command and returns a new state that
 --   results from applying the command.
 parseAndEvalCommand :: State -> String -> IO (Maybe State)
-parseAndEvalCommand state [] = putStrLn "Empty command! Enter \":h\" for a list of available commands." >> return (Just state)
+parseAndEvalCommand state [] = 
+  putStrLn "Empty command! Enter \":h\" for a list of available commands." >> 
+  return (Just state)
 parseAndEvalCommand state command
   | head command == 'q' = return Nothing
   | head command == 'h' = printHelp >> return (Just state)
@@ -70,7 +72,9 @@ parseAndEvalCommand state command
   | head command == 'l' = loadFile state command
   | head command == 'r' = reloadFile state
   | head command == 'e' = loadFile state "l ../examples/Examples.hs"
-  | otherwise = putStrLn "Unknown command! Enter \":h\" for a list of available commands." >> return (Just state)
+  | otherwise = 
+      putStrLn "Unknown command! Enter \":h\" for a list of available commands."
+       >> return (Just state)
 
 -- | changes the evalStrategy encoded in the state.
 updateStrategy :: State -> String -> IO (Maybe State)
@@ -104,7 +108,7 @@ loadFile :: State -> String -> IO (Maybe State)
 loadFile state cmd = do
   let args = words cmd
   if length args <= 1
-    -- No path provided. We should unlaod the file if one is loaded.
+    -- No path provided. We should unload the file if one is loaded.
     then if Util.notNothing (State.getPath state)
       then putStrLn ("File unloaded.") >>
         return (Just (State.setProgram state "" (Prog []) Nothing))
