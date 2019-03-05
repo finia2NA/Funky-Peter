@@ -5,7 +5,6 @@ import Evaluation
 import Pretty
 import Util
 import Prog
-import Term
 
 main :: IO ()
 main = do
@@ -118,4 +117,3 @@ printHelp = do
   putStrLn "                     where <strategy> is one of 'lo', 'li',"
   putStrLn "                     'ro', 'ri', 'po', or 'pi'."
   putStrLn "  :q[uit]            Exits the interactive environment."
-  
