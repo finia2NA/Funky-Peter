@@ -15,3 +15,6 @@ type CombName = String
 -- or a constructor or function applied to a list of terms.
 data Term = Var VarName | Comb CombName [Term]
   deriving (Eq, Show)
+
+-- instance Show Term where
+--   show = pretty

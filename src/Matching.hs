@@ -4,6 +4,7 @@ import Subst
 import Term
 import Pos
 import Data.List
+import Util
 
 -- TODO:
 -- 1. Find (Vars _) in t1 ✔
