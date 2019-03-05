@@ -17,19 +17,18 @@ exp5 = h
 -- 8.2, 3
 data Boolean = True | False
 
-or :: Boolean -> Boolean -> Boolean
-or False x = isTrue x
-or True _ = True
+genTrue = True
 
-and :: Boolean -> Boolean -> Boolean
-and True x = isTrue x
-and False _ = False
+f3 True _ = True
+f3 False _ = False
 
-isTrue :: Boolean -> Boolean
-isTrue True = True
-isTrue False = False
+f2 _ True = True
+f2 _ False = False
 
 endlessBool :: Bool
 endlessBool = endlessBool
 
-exp3 = or True endlessBool
+exp2 = f2 endlessBool genTrue
+exp3 = f3 genTrue endlessBool
+
+
