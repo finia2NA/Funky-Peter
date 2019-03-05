@@ -93,7 +93,8 @@ loadFile state cmd = do
       let filePath = args !! 1
       eitherProg <- Parser.parseFile filePath
       case eitherProg of
-        (Left msg) -> putStrLn msg >> return (Just state)
+        (Left msg) -> putStrLn msg >> 
+          return (Just (State.setProgram state "" (Prog []) (Just filePath)))
         (Right prog) -> putStrLn ("File loaded.") >>
           return (Just (State.setProgram state 
             (System.FilePath.Posix.takeBaseName filePath) prog (Just filePath)))
