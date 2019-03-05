@@ -54,70 +54,74 @@ outermost:
 -- | Alias type for evaluation strategies.
 type Strategy = Prog -> Term -> [Pos]
 
--- | left-outermost
+-- | returns a list containing the next element to reduce accourding to the
+--   left-outermost strategy
 loStrategy :: Strategy
 loStrategy = (\prog term -> if null (Reduction.reduciblePos prog term) 
     then [] 
-    else (head (List.sortBy loOrdering (reduciblePos prog term))) : []
+    else (head (List.sortBy loOrdering (Reduction.reduciblePos prog term))) : []
   )
  where
   loOrdering :: Pos -> Pos -> Ordering
   loOrdering pos1 pos2
-    | leftOf  pos1 pos2 = LT
-    | rightOf pos1 pos2 = GT
-    | above   pos1 pos2 = LT
-    | below   pos1 pos2 = GT
-    | otherwise = error "error found by strategy ™"
+    | Pos.leftOf  pos1 pos2 = LT
+    | Pos.rightOf pos1 pos2 = GT
+    | Pos.above   pos1 pos2 = LT
+    | Pos.below   pos1 pos2 = GT
+    | otherwise = error "non-exhaustive pattern in strategy"
 
--- | left-innermost
+-- | returns a list containing the next element to reduce accourding to the
+--   left-innermost strategy
 liStrategy :: Strategy
-liStrategy = (\prog term -> if null (reduciblePos prog term) 
+liStrategy = (\prog term -> if null (Reduction.reduciblePos prog term) 
     then [] 
-    else (head (List.sortBy liOrdering (reduciblePos prog term))) : []
+    else (head (List.sortBy liOrdering (Reduction.reduciblePos prog term))) : []
   )
  where
   liOrdering :: Pos -> Pos -> Ordering
   liOrdering pos1 pos2
-    | leftOf  pos1 pos2 = LT
-    | rightOf pos1 pos2 = GT
-    | below   pos1 pos2 = LT
-    | above   pos1 pos2 = GT
-    | otherwise = error "error found by strategy ™"
+    | Pos.leftOf  pos1 pos2 = LT
+    | Pos.rightOf pos1 pos2 = GT
+    | Pos.below   pos1 pos2 = LT
+    | Pos.above   pos1 pos2 = GT
+    | otherwise = error "non-exhaustive pattern in strategy"
 
--- | right-outermost
+-- | returns a list containing the next element to reduce accourding to the
+--   right-outermost strategy
 roStrategy :: Strategy
-roStrategy = (\prog term -> if null (reduciblePos prog term) 
+roStrategy = (\prog term -> if null (Reduction.reduciblePos prog term) 
     then [] 
-    else (head (List.sortBy roOrdering (reduciblePos prog term))) : []
+    else (head (List.sortBy roOrdering (Reduction.reduciblePos prog term))) : []
   )
  where
   roOrdering :: Pos -> Pos -> Ordering
   roOrdering pos1 pos2
-    | rightOf pos1 pos2 = LT
-    | leftOf  pos1 pos2 = GT
-    | above   pos1 pos2 = LT
-    | below   pos1 pos2 = GT
-    | otherwise = error "error found by strategy ™"
+    | Pos.rightOf pos1 pos2 = LT
+    | Pos.leftOf  pos1 pos2 = GT
+    | Pos.above   pos1 pos2 = LT
+    | Pos.below   pos1 pos2 = GT
+    | otherwise = error "non-exhaustive pattern in strategy"
 
--- | right-innermost
+-- | returns a list containing the next element to reduce accourding to the
+--   right-innermost strategy
 riStrategy :: Strategy
-riStrategy = (\prog term -> if null (reduciblePos prog term) 
+riStrategy = (\prog term -> if null (Reduction.reduciblePos prog term) 
     then [] 
-    else (head (List.sortBy riOrdering (reduciblePos prog term))) : []
+    else (head (List.sortBy riOrdering (Reduction.reduciblePos prog term))) : []
   )
  where
   riOrdering :: Pos -> Pos -> Ordering
   riOrdering pos1 pos2
-    | rightOf pos1 pos2 = LT
-    | leftOf  pos1 pos2 = GT
-    | below   pos1 pos2 = LT
-    | above   pos1 pos2 = GT
-    | otherwise = error "error found by strategy ™"
+    | Pos.rightOf pos1 pos2 = LT
+    | Pos.leftOf  pos1 pos2 = GT
+    | Pos.below   pos1 pos2 = LT
+    | Pos.above   pos1 pos2 = GT
+    | otherwise = error "non-exhaustive pattern in strategy"
 
-
--- | parallel outermost
+-- | returns a list containing the next elements to reduce accourding to the
+--   parallel outermost strategy
 poStrategy :: Strategy
-poStrategy = (\prog term -> getMinPosis (reduciblePos prog term))
+poStrategy = (\prog term -> getMinPosis (Reduction.reduciblePos prog term))
  where
   getMinPosis :: [Pos] -> [Pos]
   getMinPosis [] = []
@@ -126,13 +130,14 @@ poStrategy = (\prog term -> getMinPosis (reduciblePos prog term))
    where
     poOrdering :: Pos -> Pos -> Ordering
     poOrdering pos1 pos2
-      | above   pos1 pos2 = LT
-      | below   pos1 pos2 = GT
+      | Pos.above   pos1 pos2 = LT
+      | Pos.below   pos1 pos2 = GT
       | otherwise = EQ
 
--- | parallel innermost
+-- | returns a list containing the next elements to reduce accourding to the
+--   parallel innermost strategy
 piStrategy :: Strategy
-piStrategy = (\prog term -> getMinPosis (reduciblePos prog term))
+piStrategy = (\prog term -> getMinPosis (Reduction.reduciblePos prog term))
  where
   getMinPosis :: [Pos] -> [Pos]
   getMinPosis [] = []
@@ -141,8 +146,8 @@ piStrategy = (\prog term -> getMinPosis (reduciblePos prog term))
    where
     piOrdering :: Pos -> Pos -> Ordering
     piOrdering pos1 pos2
-      | below   pos1 pos2 = LT
-      | above   pos1 pos2 = GT
+      | Pos.below   pos1 pos2 = LT
+      | Pos.above   pos1 pos2 = GT
       | otherwise = EQ
 
 -- | Reduces a term using a program at the first position
@@ -150,9 +155,9 @@ piStrategy = (\prog term -> getMinPosis (reduciblePos prog term))
 reduceWith :: Strategy -> Prog -> Term -> Maybe Term
 reduceWith strat prog term
   | null stratPlan = Nothing 
-  | otherwise = foldr (\pos acc -> if notNothing acc 
-      then reduceAt prog (unwrap acc) pos 
-      else reduceAt prog term pos
+  | otherwise = foldr (\pos acc -> if Util.notNothing acc 
+      then Reduction.reduceAt prog (unwrap acc) pos 
+      else Reduction.reduceAt prog term pos
     )
     Nothing stratPlan
    where
@@ -164,4 +169,6 @@ reduceWith strat prog term
 evaluateWith :: Strategy -> Prog -> Term -> Term
 evaluateWith strat prog term
   | isNormalForm prog term = term
-  | otherwise = evaluateWith strat prog (unwrap (reduceWith strat prog term))
+  | otherwise = evaluateWith strat prog (
+    Util.unwrap (reduceWith strat prog term)
+  )
