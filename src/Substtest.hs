@@ -24,7 +24,7 @@ instance Arbitrary Term where
 
       -- generates a list of Length n of Terms of Length m.
       genN :: Int -> Int -> Gen ([Term])
-      -- TODO there probably is a better way to write this than do and immidiatly return
+      -- TODO there probably is a better way to write this than do and immediately return
       genN 0 _ = do
         return []
       genN n m = do
@@ -33,7 +33,7 @@ instance Arbitrary Term where
         return (currentTerm:xs)
 
 
--- ============================== arbitrary Subst ==============================
+-- ============================== arbitrary Substitution =======================
 instance Arbitrary Subst where
   arbitrary = sized asSub
    where

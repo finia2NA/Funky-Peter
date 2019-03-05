@@ -1,6 +1,6 @@
 module Util where
 
--- helper function for Maybe: returns wether the argument is a Just or a Nothing
+-- helper function for Maybe: returns whether the argument is a Just or Nothing
 notNothing :: Maybe a -> Bool
 notNothing (Just _) = True
 notNothing _        = False

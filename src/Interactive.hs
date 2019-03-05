@@ -21,7 +21,7 @@ main = do
   return ()
 
 -- | the user-interaction loop. For every time the user enters something, 
---   his/her input gets evaluated and a new recursion is startet.
+--   his/her input gets evaluated and a new recursion is started.
 --   if needed, the state is adjusted for the next recursion.
 --   an argument of nothing signals the user called :quit in the last
 --   recursion and we terminate.
@@ -32,13 +32,13 @@ shell (Just state) = do
   nextState <- handleInput state input
   shell nextState
 
--- | gets the userinput as a string from the console.
+-- | gets the user-input as a string from the console.
 getUserInput :: Name -> IO (String)
 getUserInput progName = do
   putStr (progName ++ "> ")
   getLine
 
--- | handles userinput: determines wether the user entered an expression
+-- | handles user-input: determines whether the user entered an expression
 --   or a command and proceeds accordingly.
 handleInput :: State -> String -> IO (Maybe State)
 handleInput state []    = return (Just state)
@@ -49,8 +49,8 @@ handleInput state input =
                 parseAndEvalExpression state input
                 return (Just state)
 
--- | interprets a given String as an expression and runs using the eval strat
---   encoded in the state.
+-- | interprets a given string as an expression and runs using the specified 
+--   strategy encoded in the state.
 parseAndEvalExpression :: State -> String -> IO ()
 parseAndEvalExpression state expr = do
   let eitherTerm = Parser.parse expr
@@ -80,7 +80,7 @@ parseAndEvalCommand state command
       putStrLn "Unknown command! Enter \":h\" for a list of available commands."
        >> return (Just state)
 
--- | changes the evalStrategy encoded in the state.
+-- | changes the eval-strategy encoded in the state.
 updateStrategy :: State -> String -> IO (Maybe State)
 updateStrategy state cmd = do
 -- words is predefined Prelude func. Splits a string at the whitespaces into a list
