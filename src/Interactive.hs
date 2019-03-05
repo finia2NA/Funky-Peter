@@ -45,19 +45,23 @@ handleInput state []    = return (Just state)
 handleInput state input =
   case input of
     (':':_) -> parseAndEvalCommand state (tail input)
-    _       -> parseAndEvalExpression state input
+    _       -> do
+                parseAndEvalExpression state input
+                return (Just state)
 
 -- | interprets a given String as an expression and runs using the eval strat
 --   encoded in the state.
-parseAndEvalExpression :: State -> String -> IO (Maybe State)
+parseAndEvalExpression :: State -> String -> IO ()
 parseAndEvalExpression state expr = do
   let eitherTerm = Parser.parse expr
   case eitherTerm of
-    (Left msg) -> putStrLn msg >> return (Just state)
+    (Left msg) -> putStrLn msg
     (Right term) -> do
-      let res = (Evaluation.evaluateWith (State.getStrategy state) (State.getProgram state) term)
+      let res = Evaluation.evaluateWith 
+                  (State.getStrategy state)
+                  (State.getProgram state)
+                  term
       putStrLn (pretty res)
-      return (Just state)
 
 -- | interprets a given string as a command and returns a new state that
 --   results from applying the command.
