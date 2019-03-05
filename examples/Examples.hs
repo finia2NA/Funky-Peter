@@ -32,3 +32,12 @@ exp2 = f2 endlessBool genTrue
 exp3 = f3 genTrue endlessBool
 
 
+-- 8.4
+t :: Boolean -> Boolean
+t True = True
+t False = t False
+
+comp :: Boolean -> Boolean -> Boolean
+comp t1 x = (t1 x)
+
+exp4 = comp t genTrue

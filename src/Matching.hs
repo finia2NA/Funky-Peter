@@ -1,30 +1,24 @@
 module Matching (match, matchV) where
 
+import Data.List
+import Pos
 import Subst
 import Term
-import Pos
-import Data.List
-
--- TODO:
--- 1. Find (Vars _) in t1 ✔
--- 2. Für jede Var: guck ob es die selbe position in t2 gibt ✔
--- 2.5. Bekomme term in t2 an der pos ✔
--- 3. ersetze diese var durch den entsprechenden austruck in t2 ✔
 
 match :: Term -> Term -> Maybe Subst
 match (Comb _ _)  (Var _)     = Nothing
 match (Var v)     t           = Just (Subst.single v t)
 match (Comb x xs) (Comb y ys) =
   if x == y && length xs == length ys
-  -- custom for loop || map mapped to [Mabye Subst]
-  then foldr composeMaybeSubst (Just Subst.identity)
-    (map (\i -> match (xs !! i) (ys !! i)) [0 .. (length xs - 1)])
-  else Nothing
-   where
-    composeMaybeSubst :: Maybe Subst -> Maybe Subst -> Maybe Subst
-    composeMaybeSubst Nothing      _        = Nothing
-    composeMaybeSubst (Just subst) (Just acc) = Just (Subst.compose subst acc)
-    composeMaybeSubst _            Nothing    = Nothing
+    -- custom for loop || map mapped to [Mabye Subst]
+    then foldr composeMaybeSubst (Just Subst.identity)
+      (map (\i -> match (xs !! i) (ys !! i)) [0 .. (length xs - 1)])
+    else Nothing
+ where
+  composeMaybeSubst :: Maybe Subst -> Maybe Subst -> Maybe Subst
+  composeMaybeSubst Nothing      _        = Nothing
+  composeMaybeSubst (Just subst) (Just acc) = Just (Subst.compose subst acc)
+  composeMaybeSubst _            Nothing    = Nothing
 
 -- Returns a list of substitutions from t1 to t2 if it is possible
 matchV :: Term -> Term -> Maybe Subst
