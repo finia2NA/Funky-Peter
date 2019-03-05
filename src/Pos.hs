@@ -2,13 +2,16 @@ module Pos where
 
 import Term
 
+-- Position of a sub-term in a term. Position is a list of indices. Each index
+-- is equivalent to the 0 based nth Argument in the term above. This position
+-- of the root is the empty list.
 type Pos = [Int]
 
--- is pos1 a function that uses pos2 as an argument?
+-- | Is pos1 above pos2? True if pos1 is a sub-list of pos2.
 above:: Pos -> Pos -> Bool
 above pos1 pos2 = length pos1 < length pos2 && pos1 == (take (length pos1) pos2)
 
--- is pos2 an argument of pos1?
+-- | Is pos1 below pos2? True if pos2 is a sub-list of pos1.
 below :: Pos -> Pos -> Bool
 below pos1 pos2 = length pos2 < length pos1 && pos2 == (take (length pos2) pos1)
 
