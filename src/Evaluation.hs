@@ -55,7 +55,7 @@ outermost:
 -- | Alias type for evaluation strategies.
 type Strategy = Prog -> Term -> [Pos]
 
--- | returns a list containing the next element to reduce accourding to the
+-- | returns a list containing the next element to reduce according to the
 --   left-outermost strategy
 loStrategy :: Strategy
 loStrategy = (\prog term -> if null (Reduction.reduciblePos prog term) 
@@ -71,7 +71,7 @@ loStrategy = (\prog term -> if null (Reduction.reduciblePos prog term)
     | Pos.below   pos1 pos2 = GT
     | otherwise = error "non-exhaustive pattern in strategy"
 
--- | returns a list containing the next element to reduce accourding to the
+-- | returns a list containing the next element to reduce according to the
 --   left-innermost strategy
 liStrategy :: Strategy
 liStrategy = (\prog term -> if null (Reduction.reduciblePos prog term) 
@@ -87,7 +87,7 @@ liStrategy = (\prog term -> if null (Reduction.reduciblePos prog term)
     | Pos.above   pos1 pos2 = GT
     | otherwise = error "non-exhaustive pattern in strategy"
 
--- | returns a list containing the next element to reduce accourding to the
+-- | returns a list containing the next element to reduce according to the
 --   right-outermost strategy
 roStrategy :: Strategy
 roStrategy = (\prog term -> if null (Reduction.reduciblePos prog term) 
@@ -103,7 +103,7 @@ roStrategy = (\prog term -> if null (Reduction.reduciblePos prog term)
     | Pos.below   pos1 pos2 = GT
     | otherwise = error "non-exhaustive pattern in strategy"
 
--- | returns a list containing the next element to reduce accourding to the
+-- | returns a list containing the next element to reduce according to the
 --   right-innermost strategy
 riStrategy :: Strategy
 riStrategy = (\prog term -> if null (Reduction.reduciblePos prog term) 
@@ -119,7 +119,7 @@ riStrategy = (\prog term -> if null (Reduction.reduciblePos prog term)
     | Pos.above   pos1 pos2 = GT
     | otherwise = error "non-exhaustive pattern in strategy"
 
--- | returns a list containing the next elements to reduce accourding to the
+-- | returns a list containing the next elements to reduce according to the
 --   parallel outermost strategy
 poStrategy :: Strategy
 poStrategy = (\prog term -> getMinPosis (Reduction.reduciblePos prog term))
@@ -135,7 +135,7 @@ poStrategy = (\prog term -> getMinPosis (Reduction.reduciblePos prog term))
       | Pos.below   pos1 pos2 = GT
       | otherwise = EQ
 
--- | returns a list containing the next elements to reduce accourding to the
+-- | returns a list containing the next elements to reduce according to the
 --   parallel innermost strategy
 piStrategy :: Strategy
 piStrategy = (\prog term -> getMinPosis (Reduction.reduciblePos prog term))
