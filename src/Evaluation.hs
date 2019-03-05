@@ -18,95 +18,104 @@ import qualified Data.List as List
 
 {-
 WIKI:
-innermost:
-  Die Argumente eines Funktionsaufsrufs werden
-  VOR der Funktionsanwendung ausgewertet.
-  Wie in imperativen Sprachen: f(g(x)) -> g wird vor f ausgeführt
 
-outermost:
-  Funktionen werden von aussen nach innen ausgeführt
-  (substituiert). Diese art Auszuwerten ist _mächtiger_ als innermost,
-  da das Programm zb bei ```f x = 1 | h = h``` für den Aufruf ```f h``` terminiert
-  Es ist allerdings nicht vereinbar mit seiteneffektbehafteten Funktionen und
-  somit nur in funktionalen Sprachen praktikabel.
-
-left vs right:
-  Bei aufrufen wie ```((square 2) + (square 5))``` gibt es mehrere innermost-
-  Positionen. Nur zu sagen, dass man eine Innermost-Strategie verfolgt ist also
-  nicht genug, um eine Strategie zu definieren. man muss noch sagen, ob man
-  gleichgestellte Argumente von links oder von rechts durchgeht.
+-- left vs right vs parallel:
+overview:
+  in when given multiple reducible positions among a path within a tree,
+  you have to specify whether to reduce the left/right side first
+  and recalculate the reducible positions or reduce both sides and then
+  recalculate.
 
 parallel:
-  Links und Rechts gleichzeitig auswerten.
+  With parallel evaluation, all reducible terms on one layer are evaluated
+  in a single step before calculating the next list of reducible positions.
+  
+
+-- innermost vs outermost:
+
+innermost:
+  The arguments of the function call
+  are evaluated before applying function itself.
+  For example, in f(g(x)), g gets evaluated before f.
+
+
+outermost:
+  Whenever possible, outer function calls are evaluated first.
+  This way of evaluating functions is more powerful than innermost evaluation,
+  since it will, for example, find a solution for the call 
+    "f h"
+  with the program
+    "f x = 1 | h = h"
+  , whereas innermost evaluation will not.  
+
 
 -}
 
-
--- Alias type for evaluation strategies.
+-- | Alias type for evaluation strategies.
 type Strategy = Prog -> Term -> [Pos]
 
--- left-outermost
+-- | left-outermost
 loStrategy :: Strategy
-loStrategy = (\prog term -> if null (reduciblePos prog term) 
+loStrategy = (\prog term -> if null (Reduction.reduciblePos prog term) 
     then [] 
     else (head (List.sortBy loOrdering (reduciblePos prog term))) : []
   )
+ where
+  loOrdering :: Pos -> Pos -> Ordering
+  loOrdering pos1 pos2
+    | leftOf  pos1 pos2 = LT
+    | rightOf pos1 pos2 = GT
+    | above   pos1 pos2 = LT
+    | below   pos1 pos2 = GT
+    | otherwise = error "error found by strategy ™"
 
-loOrdering :: Pos -> Pos -> Ordering
-loOrdering pos1 pos2
-  | leftOf  pos1 pos2 = LT
-  | rightOf pos1 pos2 = GT
-  | above   pos1 pos2 = LT
-  | below   pos1 pos2 = GT
-  | otherwise = error "error found by strategy ™"
-
--- left-innermost
+-- | left-innermost
 liStrategy :: Strategy
 liStrategy = (\prog term -> if null (reduciblePos prog term) 
     then [] 
     else (head (List.sortBy liOrdering (reduciblePos prog term))) : []
   )
+ where
+  liOrdering :: Pos -> Pos -> Ordering
+  liOrdering pos1 pos2
+    | leftOf  pos1 pos2 = LT
+    | rightOf pos1 pos2 = GT
+    | below   pos1 pos2 = LT
+    | above   pos1 pos2 = GT
+    | otherwise = error "error found by strategy ™"
 
-liOrdering :: Pos -> Pos -> Ordering
-liOrdering pos1 pos2
-  | leftOf  pos1 pos2 = LT
-  | rightOf pos1 pos2 = GT
-  | below   pos1 pos2 = LT
-  | above   pos1 pos2 = GT
-  | otherwise = error "error found by strategy ™"
-
--- right-outermost
+-- | right-outermost
 roStrategy :: Strategy
 roStrategy = (\prog term -> if null (reduciblePos prog term) 
     then [] 
     else (head (List.sortBy roOrdering (reduciblePos prog term))) : []
   )
+ where
+  roOrdering :: Pos -> Pos -> Ordering
+  roOrdering pos1 pos2
+    | rightOf pos1 pos2 = LT
+    | leftOf  pos1 pos2 = GT
+    | above   pos1 pos2 = LT
+    | below   pos1 pos2 = GT
+    | otherwise = error "error found by strategy ™"
 
-roOrdering :: Pos -> Pos -> Ordering
-roOrdering pos1 pos2
-  | rightOf pos1 pos2 = LT
-  | leftOf  pos1 pos2 = GT
-  | above   pos1 pos2 = LT
-  | below   pos1 pos2 = GT
-  | otherwise = error "error found by strategy ™"
-
--- right-innermost
+-- | right-innermost
 riStrategy :: Strategy
 riStrategy = (\prog term -> if null (reduciblePos prog term) 
     then [] 
     else (head (List.sortBy riOrdering (reduciblePos prog term))) : []
   )
+ where
+  riOrdering :: Pos -> Pos -> Ordering
+  riOrdering pos1 pos2
+    | rightOf pos1 pos2 = LT
+    | leftOf  pos1 pos2 = GT
+    | below   pos1 pos2 = LT
+    | above   pos1 pos2 = GT
+    | otherwise = error "error found by strategy ™"
 
-riOrdering :: Pos -> Pos -> Ordering
-riOrdering pos1 pos2
-  | rightOf pos1 pos2 = LT
-  | leftOf  pos1 pos2 = GT
-  | below   pos1 pos2 = LT
-  | above   pos1 pos2 = GT
-  | otherwise = error "error found by strategy ™"
 
-
--- parallel outermost
+-- | parallel outermost
 poStrategy :: Strategy
 poStrategy = (\prog term -> getMinPosis (reduciblePos prog term))
  where
@@ -114,14 +123,14 @@ poStrategy = (\prog term -> getMinPosis (reduciblePos prog term))
   getMinPosis [] = []
   getMinPosis ps = let mini = head (List.sortBy poOrdering ps) in
     filter (\p -> length p == length mini) ps
+   where
+    poOrdering :: Pos -> Pos -> Ordering
+    poOrdering pos1 pos2
+      | above   pos1 pos2 = LT
+      | below   pos1 pos2 = GT
+      | otherwise = EQ
 
-poOrdering :: Pos -> Pos -> Ordering
-poOrdering pos1 pos2
-  | above   pos1 pos2 = LT
-  | below   pos1 pos2 = GT
-  | otherwise = EQ
-
--- parallel innermost
+-- | parallel innermost
 piStrategy :: Strategy
 piStrategy = (\prog term -> getMinPosis (reduciblePos prog term))
  where
@@ -129,14 +138,15 @@ piStrategy = (\prog term -> getMinPosis (reduciblePos prog term))
   getMinPosis [] = []
   getMinPosis ps = let mini = head (List.sortBy piOrdering ps) in
     filter (\p -> length p == length mini) ps
+   where
+    piOrdering :: Pos -> Pos -> Ordering
+    piOrdering pos1 pos2
+      | below   pos1 pos2 = LT
+      | above   pos1 pos2 = GT
+      | otherwise = EQ
 
-piOrdering :: Pos -> Pos -> Ordering
-piOrdering pos1 pos2
-  | below   pos1 pos2 = LT
-  | above   pos1 pos2 = GT
-  | otherwise = EQ
-
--- Reduces a term using a program at the first position provided by a given strategy
+-- | Reduces a term using a program at the first position
+--   provided by a given strategy
 reduceWith :: Strategy -> Prog -> Term -> Maybe Term
 reduceWith strat prog term
   | null stratPlan = Nothing 
@@ -150,39 +160,8 @@ reduceWith strat prog term
     stratPlan = strat prog term
 
 
--- Evaluates a Term with a given Program until it is in its normal form.
+-- | Evaluates a Term with a given Program until it is in its normal form.
 evaluateWith :: Strategy -> Prog -> Term -> Term
 evaluateWith strat prog term
   | isNormalForm prog term = term
   | otherwise = evaluateWith strat prog (unwrap (reduceWith strat prog term))
-
-
--- -- Tests
--- addRules = Prog [Rule (Comb "add" [Comb "ZERO" [], Var "m"]) (Var "m"),
---   Rule (Comb "add" [Comb "SUCC" [Var "n"], Var "m"]) (Comb "SUCC" [Comb "add" [Var "n", Var "m"]])]
-
--- dumbRules = Prog [Rule (Var "x") (Var "x")]
-
--- term  = Var "m"
--- term1 = Comb "add" [Comb "ZERO" [], Comb "Zero" []]
--- term2 = Comb "add" [Comb "SUCC" [Comb "SUCC" [Comb "ZERO" []]], Comb "SUCC" [Comb "SUCC" [Comb "ZERO" []]]]
--- term3 = Comb "add" [Comb "SUCC" [Comb "SUCC" [Comb "ZERO" []]], Comb "add" [Comb "SUCC" [Comb "SUCC" [Comb "ZERO" []]], Comb "SUCC" [Comb "SUCC" [Comb "ZERO" []]]]]
-
--- stupidRule = Prog [(Rule (Comb "add" [(Var "n"), (Var "m")]) (Comb "plus" [(Var "n"), (Var "m")])), (Rule (Comb "plus" [(Var "n"), (Var "m")]) (Comb "plüs" [(Var "n"), (Var "m")]))]
-
--- stupidTerm = Comb "add" [Comb "ZERO" [], Comb "ZERO" []]
-
-
--- addProgUs =   Prog [Rule (Comb "add" [Comb "Zero" [], Var "m"]) (Var "m"), Rule (Comb "add" [Comb "Succ" [Var "n"], Var "m"]) (Comb "Succ" [Comb "add" [Var "n", Var "m"]])]
--- addProgThem = Prog [Rule (Comb "add" [Comb "Zero" [],Var "m"]) (Var "m"),Rule (Comb "add" [Comb "Succ" [Var "n"],Var "m"]) (Comb "Succ" [Comb "add" [Var "n",Var "m"]])]
-
--- testV4 = Comb "add" [Comb "Succ" [Comb "Succ" [Comb "Zero" []]], Comb "Succ" [Comb "Succ" [Comb "Zero" []]]]
-
--- test3 = evaluateWith loStrategy addProgThem testV4
-
--- test = evaluateWith loStrategy (Prog [Rule (Comb "add" [Comb "Zero" [],Var "m"]) (Var "m"),Rule (Comb "add" [Comb "Succ" [Var "n"],Var "m"]) (Comb "Succ" [Comb "add" [Var "n",Var "m"]])])
---   (Comb "add" [Comb "Succ" [Comb "Succ" [], Comb "Zero" []], Comb "Succ" [Comb "Succ" [], Comb "Zero" []]])
-
--- test2 = evaluateWith loStrategy (Prog [Rule (Comb "add" [Comb "Zero" [],Var "m"]) (Var "m"),Rule (Comb "add" [Comb "Succ" [Var "n"],Var "m"]) (Comb "Succ" [Comb "add" [Var "n",Var "m"]]),Rule (Comb "mul" [Comb "Zero" [],Var "m"]) (Comb "Zero" []),Rule (Comb "mul" [Comb "Succ" [Var "n"],Var "m"]) (Comb "add" [Comb "mul" [Var "n",Var "m"],Var "m"]),Rule (Comb "double"
---   [Var "x"]) (Comb "add" [Var "x",Var "x"]),Rule (Comb "square" [Var "x"]) (Comb "mul" [Var "x",Var "x"])])
---   (Comb "add" [Comb "Succ" [Comb "Succ" [],Comb "Zero" []],Comb "Succ" [Comb "Succ" [],Comb "Zero" []]])
