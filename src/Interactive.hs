@@ -36,17 +36,10 @@ handleInput state input =
 
 parseExpression :: State -> String -> IO (Maybe State)
 parseExpression state expr = do
-  putStrLn "expression ="
-  putStrLn expr
   let eitherTerm = Parser.parse expr
   case eitherTerm of
     (Left msg) -> putStrLn msg >> return (Just state)
     (Right term) -> do
-      putStrLn "term = "
-      putStrLn (show term)
-      putStrLn "program ="
-      putStrLn (show (State.getProgram state))
-      putStrLn "\n"
       let res = (Evaluation.evaluateWith (State.getStrategy state) (State.getProgram state) term)
       putStrLn (pretty res)
       return (Just state)
@@ -67,14 +60,14 @@ updateStrategy state cmd = do
 -- words is predefined Prelude func. Splits a string at the whitespaces into a list
   let args = words cmd
   if length args <= 1
-    then putStrLn ("No strategy specified." ++
+    then putStrLn ("No strategy specified. " ++
       "Enter \":h\" for a list of available strategies.") >> return (Just state)
     else do
       let maybeStrat = parseStrategy (args !! 1)
       if Util.notNothing maybeStrat
         then putStrLn ("Strategy updated to: " ++ (args !! 1)) >> 
           return (Just (State.setStrategy state (Util.unwrap maybeStrat)))
-        else putStrLn ("Unkown strategy." ++
+        else putStrLn ("Unkown strategy. " ++
         "Enter \":h\" for a list of available strategies.") >> return (Just state)
  where
   parseStrategy :: String -> Maybe Strategy
@@ -125,8 +118,4 @@ printHelp = do
   putStrLn "                     where <strategy> is one of 'lo', 'li',"
   putStrLn "                     'ro', 'ri', 'po', or 'pi'."
   putStrLn "  :q[uit]            Exits the interactive environment."
-
-
-test = evaluateWith loStrategy (Prog [Rule (Comb "add" [Comb "Zero" [],Var "m"]) (Var "m"),Rule (Comb "add" [Comb "Succ" [Var "n"],Var "m"]) (Comb "Succ" [Comb "add" [Var "n",Var "m"]]),Rule (Comb "mul" [Comb "Zero" [],Var "m"]) (Comb "Zero" []),Rule (Comb "mul" [Comb "Succ" [Var "n"],Var "m"]) (Comb "add" [Comb "mul" [Var "n",Var "m"],Var "m"]),Rule (Comb "double"
-  [Var "x"]) (Comb "add" [Var "x",Var "x"]),Rule (Comb "square" [Var "x"]) (Comb "mul" [Var "x",Var "x"])])
-  (Comb "add" [Comb "Succ" [Comb "Succ" [],Comb "Zero" []],Comb "Succ" [Comb "Succ" [],Comb "Zero" []]])
+  

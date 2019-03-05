@@ -173,13 +173,16 @@ evaluateWith strat prog term
 -- stupidTerm = Comb "add" [Comb "ZERO" [], Comb "ZERO" []]
 
 
-addProg = Prog [(Rule (Comb "add" [Comb "ZERO" [], Var "m"]) (Var "m")),
-               (Rule (Comb "add" [Comb "SUCC" [Var "n"], Var "m"]) (Comb "SUCC" [Comb "add" [Var "n", Var "m"]]))]
-testV4 = Comb "add" [Comb "SUCC" [Comb "SUCC" [Comb "ZERO" []]], Comb "SUCC" [Comb "SUCC" [Comb "ZERO" []]]]
+-- addProgUs =   Prog [Rule (Comb "add" [Comb "Zero" [], Var "m"]) (Var "m"), Rule (Comb "add" [Comb "Succ" [Var "n"], Var "m"]) (Comb "Succ" [Comb "add" [Var "n", Var "m"]])]
+-- addProgThem = Prog [Rule (Comb "add" [Comb "Zero" [],Var "m"]) (Var "m"),Rule (Comb "add" [Comb "Succ" [Var "n"],Var "m"]) (Comb "Succ" [Comb "add" [Var "n",Var "m"]])]
 
-test = evaluateWith loStrategy (Prog [Rule (Comb "add" [Comb "Zero" [],Var "m"]) (Var "m"),Rule (Comb "add" [Comb "Succ" [Var "n"],Var "m"]) (Comb "Succ" [Comb "add" [Var "n",Var "m"]])])
-  (Comb "add" [Comb "Succ" [Comb "Succ" [],Comb "Zero" []],Comb "Succ" [Comb "Succ" [],Comb "Zero" []]])
+-- testV4 = Comb "add" [Comb "Succ" [Comb "Succ" [Comb "Zero" []]], Comb "Succ" [Comb "Succ" [Comb "Zero" []]]]
 
-test2 = evaluateWith loStrategy (Prog [Rule (Comb "add" [Comb "Zero" [],Var "m"]) (Var "m"),Rule (Comb "add" [Comb "Succ" [Var "n"],Var "m"]) (Comb "Succ" [Comb "add" [Var "n",Var "m"]]),Rule (Comb "mul" [Comb "Zero" [],Var "m"]) (Comb "Zero" []),Rule (Comb "mul" [Comb "Succ" [Var "n"],Var "m"]) (Comb "add" [Comb "mul" [Var "n",Var "m"],Var "m"]),Rule (Comb "double"
-  [Var "x"]) (Comb "add" [Var "x",Var "x"]),Rule (Comb "square" [Var "x"]) (Comb "mul" [Var "x",Var "x"])])
-  (Comb "add" [Comb "Succ" [Comb "Succ" [],Comb "Zero" []],Comb "Succ" [Comb "Succ" [],Comb "Zero" []]])
+-- test3 = evaluateWith loStrategy addProgThem testV4
+
+-- test = evaluateWith loStrategy (Prog [Rule (Comb "add" [Comb "Zero" [],Var "m"]) (Var "m"),Rule (Comb "add" [Comb "Succ" [Var "n"],Var "m"]) (Comb "Succ" [Comb "add" [Var "n",Var "m"]])])
+--   (Comb "add" [Comb "Succ" [Comb "Succ" [], Comb "Zero" []], Comb "Succ" [Comb "Succ" [], Comb "Zero" []]])
+
+-- test2 = evaluateWith loStrategy (Prog [Rule (Comb "add" [Comb "Zero" [],Var "m"]) (Var "m"),Rule (Comb "add" [Comb "Succ" [Var "n"],Var "m"]) (Comb "Succ" [Comb "add" [Var "n",Var "m"]]),Rule (Comb "mul" [Comb "Zero" [],Var "m"]) (Comb "Zero" []),Rule (Comb "mul" [Comb "Succ" [Var "n"],Var "m"]) (Comb "add" [Comb "mul" [Var "n",Var "m"],Var "m"]),Rule (Comb "double"
+--   [Var "x"]) (Comb "add" [Var "x",Var "x"]),Rule (Comb "square" [Var "x"]) (Comb "mul" [Var "x",Var "x"])])
+--   (Comb "add" [Comb "Succ" [Comb "Succ" [],Comb "Zero" []],Comb "Succ" [Comb "Succ" [],Comb "Zero" []]])
