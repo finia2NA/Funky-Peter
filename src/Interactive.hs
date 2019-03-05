@@ -6,17 +6,9 @@ import Pretty
 import Util
 import Prog
 
--- main :: IO ()
-
--- data State s p= State (Strategy s) (Program p)
-
--- programmLoop :: IO State -> IO State
--- getFile :: Parse a => String -> IO (Either String a)
--- getFile url = parseFile url
-
 main :: IO ()
 main = do
-  putStrLn "Welcome to Simple Haskell!"
+  putStrLn "Welcome to Funky Peter!"
   putStrLn "Type \":h(elp)\" for help."
   shell (Just State.initalState)
   putStrLn "Leaving. Bye. Have a nice day."
