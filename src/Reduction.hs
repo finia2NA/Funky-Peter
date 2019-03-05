@@ -1,55 +1,45 @@
-module Reduction (findRule, reduceAt, reduciblePos, isNormalForm) where
+module Reduction where
 
 import Matching
-import Prog
-import Term
-import Subst
 import Pos
+import Prog
+import Subst
+import Term
 import Util
 
--- returned die erste Regel, die man auf den Term anwenden kann,
--- oder Nothing wenn es keine solche Regel gibt.
+-- | Return the right side of the first rule which can be used together with the
+-- returned substitution to reduce the given term.
 findRule:: Prog -> Term -> Maybe(Rhs, Subst)
 findRule (Prog rules) term = foldr reductor Nothing rules
  where
   reductor (Rule lh rh) acc =
-    if notNothing acc then acc -- Skip rest if we already have a return value
+    if Util.notNothing acc then acc -- Skip rest if already has return value
     else
-    if notNothing (applyableSubst)
+    if Util.notNothing (applyableSubst)
       then Just (rh, (unwrap (applyableSubst)))
       else Nothing
-   where applyableSubst = match lh term
+   where applyableSubst = Matching.match lh term
 
--- given a term t and a program p, returns a term t' which was reduced at a given pos, 
--- or nothing if such a reduction was not possible with the given p.
+-- | Reduces a term at a given position using the given program. Returns a new
+-- term with the position reduced or nothing of no reduction is possible at the
+-- given position.
 reduceAt :: Prog -> Term -> Pos -> Maybe Term
-reduceAt prog term pos = let subterm = selectAt term pos in
+reduceAt prog term pos = let subterm = Pos.selectAt term pos in
   buildReturn (findRule prog subterm)
  where
   buildReturn :: Maybe(Rhs, Subst) -> Maybe Term
-  buildReturn (Just (rh, subst)) = Just (replaceAt term pos (apply subst rh))
-  buildReturn _ = Nothing
+  buildReturn (Just (rh, subst)) =
+    Just (Pos.replaceAt term pos (Subst.apply subst rh))
+  buildReturn _                  = Nothing
 
--- returns a list of reducible positions in the given term
+-- | Returns a list of reducible positions in a given term
 reduciblePos :: Prog -> Term -> [Pos]
-reduciblePos prog term = filter isReduciblePos (allPos term)
+reduciblePos prog term = filter isReduciblePos (Pos.allPos term)
  where
   isReduciblePos :: Pos -> Bool
-  isReduciblePos pos = notNothing (findRule prog (selectAt term pos))
+  isReduciblePos pos = Util.notNothing (findRule prog (Pos.selectAt term pos))
 
--- is the given term already reduced as much as possible given this program?
+-- | A given term is in normal form for a given program if it is no longer 
+-- reducible.
 isNormalForm :: Prog -> Term -> Bool
 isNormalForm prog term = null (reduciblePos prog term)
-
--- =================================== Tests ===================================
-  
--- testProg1 = Prog [(Rule (Comb "add" [Comb "ZERO" [], Var "m"]) (Var "m"))]
--- testTerm1 = (Comb "add" [Comb "ZERO" [], Comb "SUCC" [Comb "SUCC" [Comb "ZERO" []]]])
--- test1 f = f testProg1 testTerm1
-
--- testProg2 = Prog [(Rule (Comb "add" [Comb "ZERO" [], Var "m"]) (Var "m")),
---                   (Rule (Comb "add" [Comb "SUCC" [Var "n"], Var "m"]) (Comb "SUCC" [Comb "add" [Var "n", Var "m"]]))]
--- testTerm2 = (Comb "add" [(Var "n"), (Comb "add" [Comb "ZERO" [], Comb "SUCC" [Comb "SUCC" [Comb "ZERO" []]]])])
-
--- testProg3 = Prog [(Rule (Comb "add" [(Comb "ONE" []), (Comb "ONE" [])]) (Comb "TWO" []))]
--- testTerm3 = (Comb "mult" [(Comb "ONE" []), (Comb "ONE" [])])
