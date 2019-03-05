@@ -9,6 +9,7 @@ import Prog
 main :: IO ()
 main = do
   putStrLn "Welcome to Funky Peter!"
+  putStrln getPeter
   putStrLn "Type \":h(elp)\" for help."
   shell (Just State.initalState)
   putStrLn "Leaving. Bye. Have a nice day."
@@ -117,3 +118,6 @@ printHelp = do
   putStrLn "                     where <strategy> is one of 'lo', 'li',"
   putStrLn "                     'ro', 'ri', 'po', or 'pi'."
   putStrLn "  :q[uit]            Exits the interactive environment."
+
+  getPeter :: String
+  getPeter = ""
