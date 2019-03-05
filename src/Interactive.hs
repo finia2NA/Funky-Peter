@@ -52,6 +52,7 @@ parseCommand state command
   | head command == 's' = updateStrategy state command
   | head command == 'l' = loadFile state command
   | head command == 'r' = reloadFile state
+  | head command == 'e' = loadFile state "l ../examples/Examples.hs"
   | otherwise = putStrLn "Unknown command! Enter \":h\" for a list of available commands." >> return (Just state)
 
 updateStrategy :: State -> String -> IO (Maybe State)
