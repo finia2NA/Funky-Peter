@@ -43,3 +43,11 @@ exp2 = f2 endlessBool genTrue
 
 -- | Lösung für 8.3: Terminiert für LO, nicht für RO
 exp3 = f3 genTrue endlessBool
+
+
+-- Rules for 8.4 
+
+returnTrue h True f = True
+returnTrue h False f = returnTrue h False f
+
+exp4 = returnTrue endlessBool genTrue endlessBool
