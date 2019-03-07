@@ -132,7 +132,7 @@ reloadFile :: State -> IO (Maybe State)
 reloadFile state = let path = (State.getPath state) in
   if Util.notNothing path
     then loadFile state ("l " ++ (Util.unwrap path))
-    else putStrLn ("Reloading something that does not exists is pretty much useless.") 
+    else putStrLn ("please specify a file to load before reloading.") 
       >> return (Just state)
 
 -- | prints the help information.
