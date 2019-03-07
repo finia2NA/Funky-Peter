@@ -1,4 +1,3 @@
-module Interactive(main) where
 import System.FilePath.Posix
 
 import Evaluation
