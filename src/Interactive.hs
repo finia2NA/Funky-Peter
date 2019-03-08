@@ -27,7 +27,7 @@ main = do
 shell :: Maybe State -> IO ()
 shell Nothing      = return ()
 shell (Just state) = do
-  input <- getUserInput (getName state)
+  input <- getUserInput (State.getName state)
   nextState <- handleInput state input
   shell nextState
 
