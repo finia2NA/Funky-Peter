@@ -21,7 +21,7 @@ findRule (Prog rules) term = foldr reductor Nothing rules
    where applyableSubst = Matching.match lh term
 
 -- | Reduces a term at a given position using the given program. Returns a new
--- term with the position reduced or nothing of no reduction is possible at the
+-- term with the position reduced or nothing if no reduction is possible at the
 -- given position.
 reduceAt :: Prog -> Term -> Pos -> Maybe Term
 reduceAt prog term pos = let subterm = Pos.selectAt term pos in
