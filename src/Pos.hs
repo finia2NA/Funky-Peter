@@ -18,13 +18,21 @@ below pos1 pos2 = length pos2 < length pos1 && pos2 == (take (length pos2) pos1)
 -- | Is pos1 left of pos2? True if one index is smaller than the same index in
 -- pos2 and one position is not part of the other position.
 leftOf :: Pos -> Pos -> Bool
-leftOf (p1 : ps1) (p2 : ps2) = p1 < p2 || leftOf ps1 ps2
+leftOf (p1 : ps1) (p2 : ps2)
+  | p1 < p2 = True
+  | p1 > p2 = False
+  | otherwise = leftOf ps1 ps2
+
 leftOf _          _          = False
   
 -- | Is pos1 right of pos2? True if one index is greater than the same index in
 -- pos2 and one position is not part of the other position.
 rightOf :: Pos -> Pos -> Bool
-rightOf (p1 : ps1) (p2 : ps2) = p1 > p2 || rightOf ps1 ps2
+rightOf (p1 : ps1) (p2 : ps2)
+  | p1 < p2 = False
+  | p1 > p2 = True
+  | otherwise = leftOf ps1 ps2
+  
 rightOf _          _          = False
 
 -- | Returns a sub-term of a given term at the specified position.
