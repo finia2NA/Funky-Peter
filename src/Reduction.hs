@@ -16,7 +16,7 @@ findRule (Prog rules) term = foldr reductor Nothing rules
     if Util.notNothing acc then acc -- Skip rest if already has return value
     else
     if Util.notNothing (applyableSubst)
-      then Just (rh, (unwrap (applyableSubst)))
+      then Just (rh, (Util.unwrap (applyableSubst)))
       else Nothing
    where applyableSubst = Matching.match lh term
 
