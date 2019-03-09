@@ -31,7 +31,7 @@ rightOf :: Pos -> Pos -> Bool
 rightOf (p1 : ps1) (p2 : ps2)
   | p1 < p2 = False
   | p1 > p2 = True
-  | otherwise = leftOf ps1 ps2
+  | otherwise = rightOf ps1 ps2
   
 rightOf _          _          = False
 
